@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Hanjun Kim&#39;s Blog</title>
+    <title>Posts on Hanjun Kim&#39;s Dev Blog</title>
     <link>https://hallazzang.github.io/post/</link>
-    <description>Recent content in Posts on Hanjun Kim&#39;s Blog</description>
+    <description>Recent content in Posts on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
     <lastBuildDate>Tue, 08 Oct 2019 19:51:57 +0900</lastBuildDate>
@@ -17,7 +17,7 @@
       <pubDate>Tue, 08 Oct 2019 19:51:57 +0900</pubDate>
       
       <guid>https://hallazzang.github.io/post/first-post/</guid>
-      <description>블로그에 처음으로 쓰는 글 Hugo를 사용하여 처음으로 블로그에 쓰는 글입니다.</description>
+      <description>블로그에 처음으로 쓰는 글 Hugo를 사용하여 처음으로 블로그에 쓰는 글입니다. package main import &amp;#34;fmt&amp;#34; func main() { fmt.Println(&amp;#34;hello, world!&amp;#34;) }</description>
     </item>
     
   </channel>

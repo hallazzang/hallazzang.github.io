@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Hanjun Kim&#39;s Blog</title>
+    <title>Tags on Hanjun Kim&#39;s Dev Blog</title>
     <link>https://hallazzang.github.io/tags/</link>
-    <description>Recent content in Tags on Hanjun Kim&#39;s Blog</description>
+    <description>Recent content in Tags on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
     <lastBuildDate>Tue, 08 Oct 2019 19:51:57 +0900</lastBuildDate>
