@@ -77,6 +77,9 @@ pre > code {
   padding: 1rem 1.5rem;
   white-space: pre;
 }
+code {
+  font-family: 'PT Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
 
 hr {
   margin: 2rem 0;
