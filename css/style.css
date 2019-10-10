@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css?family=Merriweather&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif+KR&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  font-family: 'Noto Serif KR', serif;
+}
+
+main {
+  margin-top: 10rem;
+  margin-bottom: 10rem;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6.5rem;
+  z-index: 99;
+  opacity: 0.93;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.navbar-list {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+
+.navbar-item {
+  margin-bottom: 0;
+}
+
+.navbar-link {
+  margin-right: 35px;
+  line-height: 6.5rem;
+  color: #222;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.post-list {
+  list-style: none;
+}
+
+.post-link {
+  text-decoration: none;
+  color: #222;
+}
+
+.post-link h2 {
+  margin-bottom: 0;
+}
+
+.post-item {
+  margin-bottom: 3rem;
+}
+
+.post-meta {
+  display: block;
+  margin-bottom: 0.8rem;
+  color: #777;
+}
+
+.post-summary {
+  margin-bottom: 0;
+  color: #333;
+}
+
+.post-title {
+  margin-bottom: 0;
+}
+
+.tags {
+  margin-bottom: 2rem;
+}
+
+.tag-list {
+  display: inline-block;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.tag-item {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.tag-link {
+  padding: 4px 6px;
+  border-radius: 4px;
+  background-color: #333;
+  color: #eee;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.footer {
+  height: 15rem;
+  background-color: #eee;
+}

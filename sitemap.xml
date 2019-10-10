@@ -3,7 +3,12 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://hallazzang.github.io/posts/first-post/</loc>
+    <loc>https://hallazzang.github.io/about/</loc>
+    <lastmod>2019-10-09T20:40:38+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/tags/diary/</loc>
     <lastmod>2019-10-08T19:51:57+09:00</lastmod>
   </url>
   
@@ -13,16 +18,22 @@
   </url>
   
   <url>
-    <loc>https://hallazzang.github.io/posts/</loc>
+    <loc>https://hallazzang.github.io/post/</loc>
+    <lastmod>2019-10-08T19:51:57+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/tags/</loc>
+    <lastmod>2019-10-08T19:51:57+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/post/first-post/</loc>
     <lastmod>2019-10-08T19:51:57+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/categories/</loc>
-  </url>
-  
-  <url>
-    <loc>https://hallazzang.github.io/tags/</loc>
   </url>
   
 </urlset>
