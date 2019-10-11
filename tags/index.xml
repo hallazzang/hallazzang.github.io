@@ -6,17 +6,26 @@
     <description>Recent content in Tags on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
-    <lastBuildDate>Tue, 08 Oct 2019 19:51:57 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 11 Oct 2019 22:24:00 +0900</lastBuildDate>
     
 	<atom:link href="https://hallazzang.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>diary</title>
-      <link>https://hallazzang.github.io/tags/diary/</link>
-      <pubDate>Tue, 08 Oct 2019 19:51:57 +0900</pubDate>
+      <title>dev</title>
+      <link>https://hallazzang.github.io/tags/dev/</link>
+      <pubDate>Fri, 11 Oct 2019 22:24:00 +0900</pubDate>
       
-      <guid>https://hallazzang.github.io/tags/diary/</guid>
+      <guid>https://hallazzang.github.io/tags/dev/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://hallazzang.github.io/tags/python/</link>
+      <pubDate>Fri, 11 Oct 2019 22:24:00 +0900</pubDate>
+      
+      <guid>https://hallazzang.github.io/tags/python/</guid>
       <description></description>
     </item>
     

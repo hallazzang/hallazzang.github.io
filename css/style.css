@@ -80,3 +80,12 @@ main {
   margin-bottom: 1rem;
   color: #999;
 }
+.post-siblings {
+  display: flex;
+  margin-top: 3rem;
+  justify-content: space-between;
+}
+
+.utterances {
+  margin-top: 1rem;
+}
