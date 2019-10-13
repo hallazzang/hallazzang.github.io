@@ -15,32 +15,33 @@
 </head>
 
   <body>
-    <header>
-  <nav class="navbar">
-    <div class="container">
-      <ul class="navbar-list">
+    <nav class="navbar">
+  <div class="container">
+    <a class="navbar-logo" href="/">
+      HALLA.DEV
+    </a>
+    <button class="navbar-toggle-btn">
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+    </button>
+    <ul id="navbar-list" class="navbar-list">
+      
         <li class="navbar-item">
-          <a class="navbar-logo" href="/">
-            HALLA.DEV
+          <a class="navbar-link" href="/">
+            Home
           </a>
         </li>
-        
-          <li class="navbar-item">
-            <a class="navbar-link" href="/">
-              Home
-            </a>
-          </li>
-        
-          <li class="navbar-item">
-            <a class="navbar-link" href="/about/">
-              About
-            </a>
-          </li>
-        
-      </ul>
-    </div>
-  </nav>
-</header>
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/about/">
+            About
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+</nav>
 
     <div class="container">
       <main>
@@ -90,5 +91,19 @@
 
       </main>
     </div>
+    <script>
+  document.querySelectorAll('.navbar-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = document.querySelector('#navbar-list');
+
+      if (list.classList.contains('visible')) {
+        list.classList.remove('visible');
+      } else {
+        list.classList.add('visible');
+      }
+    })
+  })
+</script>
+
   </body>
 </html>
