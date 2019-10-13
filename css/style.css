@@ -33,14 +33,13 @@ main {
   top: 0;
   left: 0;
   right: 0;
-  padding: 1rem 2rem;
+  padding: 0.5rem 0;
   z-index: 99;
   opacity: 0.98;
   background-color: #fff;
   border-bottom: 1px solid #e1e1e1;
 }
 .navbar > .container {
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -68,7 +67,7 @@ main {
 .navbar-link {
   color: #000;
   text-decoration: none;
-  padding: 0.5rem 0;
+  padding: 0.8rem 0;
   box-sizing: border-box;
 }
 .navbar-logo {
