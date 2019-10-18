@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="generator" content="Hugo 0.58.3" />
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/normalize.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/base.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/style.css">
+  <title>
+    
+      Creating Tray Icons using Go in Windows - Hanjun Kim&#39;s Dev Blog
+    
+  </title>
+</head>
+
+  <body>
+    <nav class="navbar">
+  <div class="container">
+    <a class="navbar-logo" href="/">
+      HALLA.DEV
+    </a>
+    <button class="navbar-toggle-btn">
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+    </button>
+    <ul id="navbar-list" class="navbar-list">
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/">
+            Home
+          </a>
+        </li>
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/about/">
+            About
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+</nav>
+
+    <div class="container">
+      <main>
+        
+
+<h1>Creating Tray Icons using Go in Windows</h1>
+<div class="post-meta">
+  <span class="post-date">
+    Published at
+    <time datetime="2019-10-18 22:02:16 &#43;0900 KST">
+      Oct 18, 2019
+    </time>
+  </span>
+</div>
+<hr>
+
+
+<p>In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with very small chunk of Go code.</p>
+
+<h2 id="about-tray-icons">About Tray Icons</h2>
+
+<p>Tray icons are icons that are displayed on the right side of your taskbar. It looks like this:</p>
+
+<figure>
+    <img src="1-tray-icons.png"
+         alt="Tray icons shown in taskbar"/> <figcaption>
+            <p>Tray icons shown in taskbar</p>
+        </figcaption>
+</figure>
+
+
+<p>You are probably familiar with tray icons already.</p>
+
+<h2 id="the-api">The API</h2>
+
+<p>To create a tray icon and to modify the state or appearance of the icon, all we have to use is <code>Shell_NotifyIcon</code> Windows API.
+It is an API that just sends a message to the OS taskbar as documented in <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw">MSDN</a>:</p>
+
+<blockquote>
+<p>Sends a message to the taskbar&rsquo;s status area.</p>
+</blockquote>
+
+<p>Its signature looks like this:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">BOOL <span style="color:#447fcf">Shell_NotifyIconW</span>(
+  DWORD            dwMessage,
+  PNOTIFYICONDATAW lpData
+);</code></pre></div>
+<p>The first parameter, <code>dwMessage</code> specifies what action to perform. It can be one of <code>NIM_ADD</code>, <code>NIM_MODIFY</code>, <code>NIM_DELETE</code>, <code>NIM_SETFOCUS</code> and <code>NIM_SETVERSION</code>. We primarily use <code>NIM_ADD</code>, <code>NIM_MODIFY</code> and <code>NIM_DELETE</code> for creating, modifying and removing tray icon, respectively.</p>
+
+<p>The second parameter, <code>lpData</code> holds information about the action. If we were going to create a new tray icon, we would set <code>szTip</code> and <code>hIcon</code> fields of the struct and then pass it to the API. Its type is <code>PNOTIFYICONDATAW</code>, that is, a pointer to <code>NOTIFYICONDATAW</code> struct:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#6ab825;font-weight:bold">typedef</span> <span style="color:#6ab825;font-weight:bold">struct</span> _NOTIFYICONDATAW {
+  DWORD cbSize;
+  HWND  hWnd;
+  UINT  uID;
+  UINT  uFlags;
+  UINT  uCallbackMessage;
+  HICON hIcon;
+<span style="color:#cd2828;font-weight:bold">#if ...
+</span><span style="color:#cd2828;font-weight:bold"></span>  WCHAR szTip[<span style="color:#3677a9">64</span>];
+<span style="color:#cd2828;font-weight:bold">#else
+</span><span style="color:#cd2828;font-weight:bold"></span>  WCHAR szTip[<span style="color:#3677a9">128</span>];
+<span style="color:#cd2828;font-weight:bold">#endif
+</span><span style="color:#cd2828;font-weight:bold"></span>  DWORD dwState;
+  DWORD dwStateMask;
+  WCHAR szInfo[<span style="color:#3677a9">256</span>];
+  <span style="color:#6ab825;font-weight:bold">union</span> {
+    UINT uTimeout;
+    UINT uVersion;
+  } DUMMYUNIONNAME;
+  WCHAR szInfoTitle[<span style="color:#3677a9">64</span>];
+  DWORD dwInfoFlags;
+  GUID  guidItem;
+  HICON hBalloonIcon;
+} NOTIFYICONDATAW, *PNOTIFYICONDATAW;</code></pre></div>
+<p>This struct may look scary at first cause it has lots of fields, but only some combinations of those are actually used in a single API call.</p>
+
+<h2 id="types-and-procedures">Types and Procedures</h2>
+
+<p>As always, we should define Go types for Windows API and find procedures.</p>
+
+<h3 id="types">Types</h3>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> NOTIFYICONDATA <span style="color:#6ab825;font-weight:bold">struct</span> {
+	CbSize           <span style="color:#6ab825;font-weight:bold">uint32</span>
+	HWnd             <span style="color:#6ab825;font-weight:bold">uintptr</span>
+	UID              <span style="color:#6ab825;font-weight:bold">uint32</span>
+	UFlags           <span style="color:#6ab825;font-weight:bold">uint32</span>
+	UCallbackMessage <span style="color:#6ab825;font-weight:bold">uint32</span>
+	HIcon            <span style="color:#6ab825;font-weight:bold">uintptr</span>
+	SzTip            [<span style="color:#3677a9">128</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	DwState          <span style="color:#6ab825;font-weight:bold">uint32</span>
+	DwStateMask      <span style="color:#6ab825;font-weight:bold">uint32</span>
+	SzInfo           [<span style="color:#3677a9">256</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	UVersion         <span style="color:#6ab825;font-weight:bold">uint32</span>
+	SzInfoTitle      [<span style="color:#3677a9">64</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	DwInfoFlags      <span style="color:#6ab825;font-weight:bold">uint32</span>
+	GuidItem         GUID
+	HBalloonIcon     <span style="color:#6ab825;font-weight:bold">uintptr</span>
+}</code></pre></div>
+<p>You can omit the type prefixes used for the Hungarian notation as so:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> NOTIFYICONDATA <span style="color:#6ab825;font-weight:bold">struct</span> {
+	Size            <span style="color:#6ab825;font-weight:bold">uint32</span>
+	HWnd            <span style="color:#6ab825;font-weight:bold">uintptr</span>
+	UID             <span style="color:#6ab825;font-weight:bold">uint32</span>
+	Flags           <span style="color:#6ab825;font-weight:bold">uint32</span>
+	CallbackMessage <span style="color:#6ab825;font-weight:bold">uint32</span>
+	Icon            <span style="color:#6ab825;font-weight:bold">uintptr</span>
+	Tip             [<span style="color:#3677a9">128</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	State           <span style="color:#6ab825;font-weight:bold">uint32</span>
+	StateMask       <span style="color:#6ab825;font-weight:bold">uint32</span>
+	Info            [<span style="color:#3677a9">256</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	Version         <span style="color:#6ab825;font-weight:bold">uint32</span>
+	InfoTitle       [<span style="color:#3677a9">64</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
+	InfoFlags       <span style="color:#6ab825;font-weight:bold">uint32</span>
+	GuidItem        GUID
+	BalloonIcon     <span style="color:#6ab825;font-weight:bold">uintptr</span>
+}</code></pre></div>
+<p>But I&rsquo;ll keep using the first one since it reflects the original documentation better.</p>
+
+<p>As you see above, there is also <a href="https://docs.microsoft.com/en-us/windows/win32/api/guiddef/ns-guiddef-guid"><code>GUID</code></a> struct. Let&rsquo;s define this too:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> GUID <span style="color:#6ab825;font-weight:bold">struct</span> {
+	Data1 <span style="color:#6ab825;font-weight:bold">uint32</span>
+	Data2 <span style="color:#6ab825;font-weight:bold">uint16</span>
+	Data3 <span style="color:#6ab825;font-weight:bold">uint16</span>
+	Data4 [<span style="color:#3677a9">8</span>]<span style="color:#6ab825;font-weight:bold">byte</span>
+}</code></pre></div>
+<p>So we are all ready for the data types.</p>
+
+<h3 id="procedures">Procedures</h3>
+
+<nav class="post-siblings">
+  <div>
+    
+      <a title="파이썬 웹 크롤러 만들기 #1" href="/post/web-crawling-1/">
+        &laquo; Previous Post
+      </a>
+    
+  </div>
+  <div>
+    
+  </div>
+</nav>
+<script src="https://utteranc.es/client.js"
+        repo="hallazzang/hallazzang.github.io"
+        issue-term="pathname"
+        label="utterances-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+      </main>
+    </div>
+    <script>
+  document.querySelectorAll('.navbar-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = document.querySelector('#navbar-list');
+
+      if (list.classList.contains('visible')) {
+        list.classList.remove('visible');
+      } else {
+        list.classList.add('visible');
+      }
+    })
+  })
+</script>
+
+  </body>
+</html>
