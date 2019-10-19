@@ -17,7 +17,7 @@
       <pubDate>Fri, 18 Oct 2019 22:02:16 +0900</pubDate>
       
       <guid>https://hallazzang.github.io/post/go-tray-icons/</guid>
-      <description>This tutorial will help you understand how tray icons(a.k.a. NotifyIcon) work on Windows and how to play with them.</description>
+      <description>In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with very small chunk of Go code.</description>
     </item>
     
   </channel>
