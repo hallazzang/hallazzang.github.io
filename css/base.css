@@ -75,6 +75,7 @@ pre > code {
   display: block;
   padding: 1rem 1.5rem;
   white-space: pre;
+  font-size: 90%;
 }
 code {
   font-family: 'PT Mono', 'Menlo', 'Monaco', 'Consolas', monospace;

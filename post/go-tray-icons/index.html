@@ -128,6 +128,8 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
 } NOTIFYICONDATAW, *PNOTIFYICONDATAW;</code></pre></div>
 <p>This struct may look scary at first cause it has lots of fields, but only some combinations of those are actually used in a single API call.</p>
 
+<p>For example, if you want to create a new tray icon in taskbar, you would set <code>dwMessage</code> to <code>NIM_ADD</code> and set an icon handle for <code>hIcon</code> field of <code>NOTIFYICONDATA</code> struct which <code>lpData</code> points to.</p>
+
 <h2 id="types-and-procedures">Types and Procedures</h2>
 
 <p>As always, we should define Go types for Windows API and find procedures.</p>
@@ -150,26 +152,6 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
 	GuidItem         GUID
 	HBalloonIcon     <span style="color:#6ab825;font-weight:bold">uintptr</span>
 }</code></pre></div>
-<p>You can omit the type prefixes used for the Hungarian notation as so:</p>
-<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> NOTIFYICONDATA <span style="color:#6ab825;font-weight:bold">struct</span> {
-	Size            <span style="color:#6ab825;font-weight:bold">uint32</span>
-	HWnd            <span style="color:#6ab825;font-weight:bold">uintptr</span>
-	UID             <span style="color:#6ab825;font-weight:bold">uint32</span>
-	Flags           <span style="color:#6ab825;font-weight:bold">uint32</span>
-	CallbackMessage <span style="color:#6ab825;font-weight:bold">uint32</span>
-	Icon            <span style="color:#6ab825;font-weight:bold">uintptr</span>
-	Tip             [<span style="color:#3677a9">128</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
-	State           <span style="color:#6ab825;font-weight:bold">uint32</span>
-	StateMask       <span style="color:#6ab825;font-weight:bold">uint32</span>
-	Info            [<span style="color:#3677a9">256</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
-	Version         <span style="color:#6ab825;font-weight:bold">uint32</span>
-	InfoTitle       [<span style="color:#3677a9">64</span>]<span style="color:#6ab825;font-weight:bold">uint16</span>
-	InfoFlags       <span style="color:#6ab825;font-weight:bold">uint32</span>
-	GuidItem        GUID
-	BalloonIcon     <span style="color:#6ab825;font-weight:bold">uintptr</span>
-}</code></pre></div>
-<p>But I&rsquo;ll keep using the first one since it reflects the original documentation better.</p>
-
 <p>As you see above, there is also <a href="https://docs.microsoft.com/en-us/windows/win32/api/guiddef/ns-guiddef-guid"><code>GUID</code></a> struct. Let&rsquo;s define this too:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> GUID <span style="color:#6ab825;font-weight:bold">struct</span> {
 	Data1 <span style="color:#6ab825;font-weight:bold">uint32</span>
@@ -177,9 +159,24 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
 	Data3 <span style="color:#6ab825;font-weight:bold">uint16</span>
 	Data4 [<span style="color:#3677a9">8</span>]<span style="color:#6ab825;font-weight:bold">byte</span>
 }</code></pre></div>
-<p>So we are all ready for the data types.</p>
+<p>So we are all set for the data types.</p>
 
 <h3 id="procedures">Procedures</h3>
+
+<p><code>Shell_NotifyIconW</code> is in the <code>shell32.dll</code> as documented in MSDN.
+We&rsquo;re going to load <code>shell32.dll</code> first and find <code>Shell_NotifyIconW</code>&rsquo;s address.</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">libshell32 := windows.<span style="color:#447fcf">NewLazySystemDLL</span>(<span style="color:#ed9d13">&#34;shell32.dll&#34;</span>)
+procShell_NotifyIconW := libshell32.<span style="color:#447fcf">NewProc</span>(<span style="color:#ed9d13">&#34;Shell_NotifyIconW&#34;</span>)</code></pre></div>
+<p>Good. Now we could call the API directly by using: <code>procShell_NotifyIconW.Call()</code>.
+But, it&rsquo;s a good habit to wrap an API call into a Go function like so:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">Shell_NotifyIcon</span>(dwMessage <span style="color:#6ab825;font-weight:bold">uint32</span>, lpData *NOTIFYICONDATA) <span style="color:#6ab825;font-weight:bold">int32</span> {
+	libshell32 := windows.<span style="color:#447fcf">NewLazySystemDLL</span>(<span style="color:#ed9d13">&#34;shell32.dll&#34;</span>)
+	procShell_NotifyIconW := libshell32.<span style="color:#447fcf">NewProc</span>(<span style="color:#ed9d13">&#34;Shell_NotifyIconW&#34;</span>)
+	r, _, _ := procShell_NotifyIconW.<span style="color:#447fcf">Call</span>(
+		<span style="color:#24909d">uintptr</span>(dwMessage), <span style="color:#24909d">uintptr</span>(unsafe.<span style="color:#447fcf">Pointer</span>(lpData)))
+	<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#24909d">int32</span>(r)
+}</code></pre></div>
+<p>In this way, we can keep type signatures for the API and take advantage of IDE&rsquo;s auto-completion.</p>
 
 <nav class="post-siblings">
   <div>
