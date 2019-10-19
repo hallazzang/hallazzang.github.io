@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go on Hanjun Kim&#39;s Dev Blog</title>
+    <link>https://hallazzang.github.io/tags/go/</link>
+    <description>Recent content in go on Hanjun Kim&#39;s Dev Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ko-kr</language>
+    <lastBuildDate>Fri, 18 Oct 2019 22:02:16 +0900</lastBuildDate>
+    
+	<atom:link href="https://hallazzang.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Creating Tray Icons using Go in Windows</title>
+      <link>https://hallazzang.github.io/post/go-tray-icons/</link>
+      <pubDate>Fri, 18 Oct 2019 22:02:16 +0900</pubDate>
+      
+      <guid>https://hallazzang.github.io/post/go-tray-icons/</guid>
+      <description>This tutorial will help you understand how tray icons(a.k.a. NotifyIcon) work on Windows and how to play with them.</description>
+    </item>
+    
+  </channel>
+</rss>
