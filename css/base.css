@@ -94,6 +94,10 @@ figcaption {
   color: #444;
 }
 
+img {
+  max-width: 100%;
+}
+
 :not(pre) > code {
   font-weight: 600;
 }
