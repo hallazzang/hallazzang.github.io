@@ -144,9 +144,51 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
 
 <p>For example, if you want to create a new tray icon in taskbar, you would set <code>dwMessage</code> to <code>NIM_ADD</code> and set an icon handle for <code>hIcon</code> field of <code>NOTIFYICONDATA</code> struct which <code>lpData</code> points to.</p>
 
-<h2 id="types-and-procedures">Types and Procedures</h2>
+<h2 id="prerequisites">Prerequisites</h2>
 
-<p>As always, we should define Go types for Windows API and find procedures.</p>
+<p>You should install <code>golang.org/x/sys/windows</code> package in order to follow this tutorial.</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ go get -u golang.org/x/sys/windows</code></pre></div>
+<h2 id="types-constants-and-procedures">Types, Constants and Procedures</h2>
+
+<p>As always, we should define Go types and constants for Windows API and find procedures.</p>
+
+<h3 id="constants">Constants</h3>
+
+<p>Define some constants that we&rsquo;re going to use, as described in MSDN:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">const</span> (
+	NIM_ADD        = <span style="color:#3677a9">0x00000000</span>
+	NIM_MODIFY     = <span style="color:#3677a9">0x00000001</span>
+	NIM_DELETE     = <span style="color:#3677a9">0x00000002</span>
+	NIM_SETFOCUS   = <span style="color:#3677a9">0x00000003</span>
+	NIM_SETVERSION = <span style="color:#3677a9">0x00000004</span>
+
+	NIF_MESSAGE  = <span style="color:#3677a9">0x00000001</span>
+	NIF_ICON     = <span style="color:#3677a9">0x00000002</span>
+	NIF_TIP      = <span style="color:#3677a9">0x00000004</span>
+	NIF_STATE    = <span style="color:#3677a9">0x00000008</span>
+	NIF_INFO     = <span style="color:#3677a9">0x00000010</span>
+	NIF_GUID     = <span style="color:#3677a9">0x00000020</span>
+	NIF_REALTIME = <span style="color:#3677a9">0x00000040</span>
+	NIF_SHOWTIP  = <span style="color:#3677a9">0x00000080</span>
+
+	NIS_HIDDEN     = <span style="color:#3677a9">0x00000001</span>
+	NIS_SHAREDICON = <span style="color:#3677a9">0x00000002</span>
+
+	NIIF_NONE               = <span style="color:#3677a9">0x00000000</span>
+	NIIF_INFO               = <span style="color:#3677a9">0x00000001</span>
+	NIIF_WARNING            = <span style="color:#3677a9">0x00000002</span>
+	NIIF_ERROR              = <span style="color:#3677a9">0x00000003</span>
+	NIIF_USER               = <span style="color:#3677a9">0x00000004</span>
+	NIIF_NOSOUND            = <span style="color:#3677a9">0x00000010</span>
+	NIIF_LARGE_ICON         = <span style="color:#3677a9">0x00000020</span>
+	NIIF_RESPECT_QUIET_TIME = <span style="color:#3677a9">0x00000080</span>
+	NIIF_ICON_MASK          = <span style="color:#3677a9">0x0000000F</span>
+
+	NIN_BALLOONSHOW      = <span style="color:#3677a9">0x0402</span>
+	NIN_BALLOONTIMEOUT   = <span style="color:#3677a9">0x0404</span>
+	NIN_BALLOONUSERCLICK = <span style="color:#3677a9">0x0405</span>
+)</code></pre></div>
+<p>These are came from <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw">Shell_NotifyIconW</a> and <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataw">NOTIFYICONDATAW</a> documentation.</p>
 
 <h3 id="types">Types</h3>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> NOTIFYICONDATA <span style="color:#6ab825;font-weight:bold">struct</span> {
@@ -191,6 +233,102 @@ But, it&rsquo;s a good habit to wrap an API call into a Go function like so:</p>
 	<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#24909d">int32</span>(r)
 }</code></pre></div>
 <p>In this way, we can keep type signatures for the API and take advantage of IDE&rsquo;s auto-completion.</p>
+
+<h2 id="first-tray-icon">First Tray Icon</h2>
+
+<p>Now it&rsquo;s time to test if we can create a tray icon.
+Code is so simple:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
+
+data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(data))
+
+<span style="color:#6ab825;font-weight:bold">if</span> <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_ADD, &amp;data) == <span style="color:#3677a9">0</span> {
+	<span style="color:#24909d">panic</span>(<span style="color:#ed9d13">&#34;Shell_NotifyIcon failed&#34;</span>)
+}</code></pre></div>
+<p>If it runs without panic, a tray icon would be shown in taskbar.
+If you&rsquo;re using Windows 10, you would see nothing but a transparent box, because we didn&rsquo;t set an icon for it.
+Windows 7 users can see a default application icon, but it&rsquo;s good to have our own icon displayed.</p>
+
+<h3 id="loading-icon">Loading Icon</h3>
+
+<p>We&rsquo;re gonna load an icon resource from a file.
+You can use any icon you want as long as it&rsquo;s an <code>.ico</code> file.
+Or you can use a sample icon: <a href="https://github.com/hallazzang/go-windows-programming/raw/master/example/gui/notifyicon/icon.ico">Sample Icon</a></p>
+
+<p>Place it under the same directory your <code>main.go</code> lives in. And let&rsquo;s write some code to load it:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">const</span> (
+	IMAGE_ICON = <span style="color:#3677a9">1</span>
+
+	LR_DEFAULTSIZE  = <span style="color:#3677a9">0x00000040</span>
+	LR_LOADFROMFILE = <span style="color:#3677a9">0x00000010</span>
+)
+
+<span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">LoadImage</span>(
+	hInst <span style="color:#6ab825;font-weight:bold">uintptr</span>,
+	name *<span style="color:#6ab825;font-weight:bold">uint16</span>,
+	type_ <span style="color:#6ab825;font-weight:bold">uint32</span>,
+	cx, cy <span style="color:#6ab825;font-weight:bold">int32</span>,
+	fuLoad <span style="color:#6ab825;font-weight:bold">uint32</span>) <span style="color:#6ab825;font-weight:bold">uintptr</span> {
+	libuser32 := windows.<span style="color:#447fcf">NewLazySystemDLL</span>(<span style="color:#ed9d13">&#34;user32.dll&#34;</span>)
+	procLoadImageW := libuser32.<span style="color:#447fcf">NewProc</span>(<span style="color:#ed9d13">&#34;LoadImageW&#34;</span>)
+	r, _, _ := procLoadImageW.<span style="color:#447fcf">Call</span>(
+		hInst,
+		<span style="color:#24909d">uintptr</span>(unsafe.<span style="color:#447fcf">Pointer</span>(name)),
+		<span style="color:#24909d">uintptr</span>(type_),
+		<span style="color:#24909d">uintptr</span>(cx),
+		<span style="color:#24909d">uintptr</span>(cy),
+		<span style="color:#24909d">uintptr</span>(fuLoad))
+	<span style="color:#6ab825;font-weight:bold">return</span> r
+}
+
+<span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">loadIconFromFile</span>(name <span style="color:#6ab825;font-weight:bold">string</span>) <span style="color:#6ab825;font-weight:bold">uintptr</span> {
+	hIcon := <span style="color:#447fcf">LoadImage</span>(
+		<span style="color:#3677a9">0</span>,
+		windows.<span style="color:#447fcf">StringToUTF16Ptr</span>(name),
+		IMAGE_ICON,
+		<span style="color:#3677a9">0</span>, <span style="color:#3677a9">0</span>,
+		LR_DEFAULTSIZE|LR_LOADFROMFILE)
+
+	<span style="color:#6ab825;font-weight:bold">return</span> hIcon
+}</code></pre></div>
+<p>Here I made a wrapper function <code>LoadImage</code> in the way we did for <code>Shell_NotifyIconW</code>. You can find more details about <code>LoadImageW</code> API in <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew">MSDN</a>.</p>
+
+<p>And I made an extra helper function <code>loadIconFromFile</code>, which simply takes a file name and loads it using <code>LoadImage</code> API, then returns the icon handle.</p>
+
+<p>Now we can load any icon using this helper function:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">hIcon := <span style="color:#447fcf">loadIconFromFile</span>(<span style="color:#ed9d13">&#34;icon.ico&#34;</span>)</code></pre></div>
+<h3 id="setting-icon">Setting Icon</h3>
+
+<p>Let&rsquo;s set an icon for our tray icon:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
+
+data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(data))
+data.UFlags = win.NIF_ICON
+
+icon := <span style="color:#447fcf">loadIconFromFile</span>(<span style="color:#ed9d13">&#34;icon.ico&#34;</span>)
+<span style="color:#6ab825;font-weight:bold">if</span> icon == <span style="color:#3677a9">0</span> {
+	<span style="color:#24909d">panic</span>(<span style="color:#ed9d13">&#34;LoadImageW failed&#34;</span>)
+}
+data.HIcon = icon
+
+<span style="color:#6ab825;font-weight:bold">if</span> <span style="color:#447fcf">Shell_NotifyIcon</span>(win.NIM_ADD, &amp;data) == <span style="color:#3677a9">0</span> {
+	<span style="color:#24909d">panic</span>(<span style="color:#ed9d13">&#34;Shell_NotifyIcon failed&#34;</span>)
+}</code></pre></div>
+<p>This will result in:</p>
+
+<figure>
+    <img src="2-custom-icon.png"
+         alt="Custom icon shown in taskbar"/> <figcaption>
+            <p>Custom icon shown in taskbar</p>
+        </figcaption>
+</figure>
+
+
+<p>Cool! But wait, if you hover your mouse on the icon, it will disappear.
+This is because it doesn&rsquo;t have an associated window that receives window messages for tray icon.
+To fix this problem, we should create an empty window which acts as a message receiver.</p>
+
+<p>(WIP)</p>
 
 <nav class="post-siblings">
   <div>
