@@ -25,7 +25,7 @@ if (!doNotTrack) {
 
 <meta property="og:image" content="https://hallazzang.github.io/img/profile.png" />
 <meta property="article:published_time" content="2019-10-18T22:02:16+09:00" />
-<meta property="article:modified_time" content="2019-10-20T17:02:00+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
+<meta property="article:modified_time" content="2019-10-20T18:37:00+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
 
   <link rel="stylesheet" href="https://hallazzang.github.io/css/normalize.css">
   <link rel="stylesheet" href="https://hallazzang.github.io/css/base.css">
@@ -349,7 +349,134 @@ I can even write a separate tutorial about creating a simple window.
 So I&rsquo;m gonna omit the definitions in this tutorial.
 Of course you can find the full code at <a href="https://github.com/hallazzang/go-tray-icons-tutorial/blob/66beefdbdfeccff1f4b5f9170153758fbb2ef83c/winapi.go#L177-L267">here</a>.</p>
 
-<p>(Actively writing rest of the content)</p>
+<p>If you&rsquo;re all set with those definitions, let&rsquo;s create a window. Here&rsquo;s the function that creates main window:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">createMainWindow</span>() (<span style="color:#6ab825;font-weight:bold">uintptr</span>, <span style="color:#6ab825;font-weight:bold">error</span>) {
+	hInstance, err := <span style="color:#447fcf">GetModuleHandle</span>(<span style="color:#6ab825;font-weight:bold">nil</span>)
+	<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>, err
+	}
+
+	wndClass := windows.<span style="color:#447fcf">StringToUTF16Ptr</span>(<span style="color:#ed9d13">&#34;MyWindow&#34;</span>)
+
+	<span style="color:#6ab825;font-weight:bold">var</span> wcex WNDCLASSEX
+
+	wcex.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(wcex))
+	wcex.LpfnWndProc = windows.<span style="color:#447fcf">NewCallback</span>(wndProc)
+	wcex.HInstance = hInstance
+	wcex.LpszClassName = wndClass
+	<span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">RegisterClassEx</span>(&amp;wcex); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>, err
+	}
+
+	hwnd, err := <span style="color:#447fcf">CreateWindowEx</span>(
+		<span style="color:#3677a9">0</span>,
+		wndClass,
+		windows.<span style="color:#447fcf">StringToUTF16Ptr</span>(<span style="color:#ed9d13">&#34;Tray Icons Example&#34;</span>),
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		<span style="color:#3677a9">400</span>,
+		<span style="color:#3677a9">300</span>,
+		<span style="color:#3677a9">0</span>,
+		<span style="color:#3677a9">0</span>,
+		hInstance,
+		<span style="color:#6ab825;font-weight:bold">nil</span>)
+	<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>, err
+	}
+
+	<span style="color:#6ab825;font-weight:bold">return</span> hwnd, <span style="color:#6ab825;font-weight:bold">nil</span>
+}</code></pre></div>
+<p>I&rsquo;m not gonna go deeper with it, since it&rsquo;s just a boilerplate needed for creating an empty window.</p>
+
+<p>Look at how we use <code>wndProc</code> for <code>WNDCLASSEX.LpfnWndProc</code>:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">wcex.LpfnWndProc = windows.<span style="color:#447fcf">NewCallback</span>(wndProc)</code></pre></div>
+<p>This <code>wndProc</code> is a callback function that handles window messages for our main window, and tray icon window. Here&rsquo;s the definition of it:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">wndProc</span>(hWnd <span style="color:#6ab825;font-weight:bold">uintptr</span>, msg <span style="color:#6ab825;font-weight:bold">uint32</span>, wParam, lParam <span style="color:#6ab825;font-weight:bold">uintptr</span>) <span style="color:#6ab825;font-weight:bold">uintptr</span> {
+	<span style="color:#6ab825;font-weight:bold">switch</span> msg {
+	<span style="color:#6ab825;font-weight:bold">case</span> WM_DESTROY:
+		<span style="color:#447fcf">PostQuitMessage</span>(<span style="color:#3677a9">0</span>)
+	<span style="color:#6ab825;font-weight:bold">default</span>:
+		r, _ := <span style="color:#447fcf">DefWindowProc</span>(hWnd, msg, wParam, lParam)
+		<span style="color:#6ab825;font-weight:bold">return</span> r
+	}
+	<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>
+}</code></pre></div>
+<p>What it does is so simple:
+if message is <code>WM_DESTROY</code>, make our program to quit and for other messages, just leave the default behavior untouched.</p>
+
+<p>And last thing to make our window interactable, we should run a message loop.
+Think of it as an infinite loop which grabs window messages sent from OS to our application and dispatches it to proper window. It&rsquo;s code is simple enough:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> msg MSG
+
+<span style="color:#6ab825;font-weight:bold">for</span> {
+	r, err := <span style="color:#447fcf">GetMessage</span>(&amp;msg, <span style="color:#3677a9">0</span>, <span style="color:#3677a9">0</span>, <span style="color:#3677a9">0</span>)
+	<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#24909d">panic</span>(err)
+	}
+	<span style="color:#6ab825;font-weight:bold">if</span> r == <span style="color:#3677a9">0</span> {
+		<span style="color:#6ab825;font-weight:bold">break</span>
+	}
+
+	<span style="color:#447fcf">TranslateMessage</span>(&amp;msg)
+	<span style="color:#447fcf">DispatchMessage</span>(&amp;msg)
+}</code></pre></div>
+<p>Note that the message loop should go at the end of our main function.</p>
+
+<h3 id="tray-icon-associated-with-window">Tray Icon Associated with Window</h3>
+
+<p>Now we are all ready to go.
+Let&rsquo;s create our non-disappearing tray icon!</p>
+
+<p>First, create an empty main window:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">hwnd, err := <span style="color:#447fcf">createMainWindow</span>()
+<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+	<span style="color:#24909d">panic</span>(err)
+}</code></pre></div>
+<p>Then prepare our <code>NOTIFYICONDATA</code> struct(Note that we set <code>HWnd</code> member with the window handle we created above):</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
+
+data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(data))
+data.UFlags = NIF_ICON
+data.HWnd = hwnd
+
+icon, err := <span style="color:#447fcf">LoadImage</span>(
+	<span style="color:#3677a9">0</span>,
+	windows.<span style="color:#447fcf">StringToUTF16Ptr</span>(<span style="color:#ed9d13">&#34;icon.ico&#34;</span>),
+	IMAGE_ICON,
+	<span style="color:#3677a9">0</span>,
+	<span style="color:#3677a9">0</span>,
+	LR_DEFAULTSIZE|LR_LOADFROMFILE)
+<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+	<span style="color:#24909d">panic</span>(err)
+}
+data.HIcon = icon</code></pre></div>
+<p>And let it be displayed:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_ADD, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+	<span style="color:#24909d">panic</span>(err)
+}</code></pre></div>
+<p>Finally, show our main window so that users can see and close the window, then run the message loop:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#447fcf">ShowWindow</span>(hwnd, SW_SHOW)
+
+<span style="color:#6ab825;font-weight:bold">var</span> msg MSG
+
+<span style="color:#6ab825;font-weight:bold">for</span> {
+	r, err := <span style="color:#447fcf">GetMessage</span>(&amp;msg, <span style="color:#3677a9">0</span>, <span style="color:#3677a9">0</span>, <span style="color:#3677a9">0</span>)
+	<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#24909d">panic</span>(err)
+	}
+	<span style="color:#6ab825;font-weight:bold">if</span> r == <span style="color:#3677a9">0</span> {
+		<span style="color:#6ab825;font-weight:bold">break</span>
+	}
+
+	<span style="color:#447fcf">TranslateMessage</span>(&amp;msg)
+	<span style="color:#447fcf">DispatchMessage</span>(&amp;msg)
+}</code></pre></div>
+<p>And that&rsquo;s it.
+It wasn&rsquo;t that hard, was it?
+Hover your mouse over the tray icon, and check it&rsquo;s not dissapearing anymore.</p>
+
+<p>(Actively writing)</p>
 
 <nav class="post-siblings">
   <div>
