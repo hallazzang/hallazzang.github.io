@@ -18,14 +18,14 @@ if (!doNotTrack) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="generator" content="Hugo 0.58.3" />
-  <meta property="og:title" content="Creating Tray Icons using Go in Windows" />
+  <meta property="og:title" content="Creating Tray Icons using Go in Windows - Part 1" />
 <meta property="og:description" content="In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with relatively small chunk of Go code." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hallazzang.github.io/post/go-tray-icons/" />
 
 <meta property="og:image" content="https://hallazzang.github.io/img/profile.png" />
 <meta property="article:published_time" content="2019-10-18T22:02:16+09:00" />
-<meta property="article:modified_time" content="2019-10-20T18:37:00+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
+<meta property="article:modified_time" content="2019-10-20T19:15:00+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
 
   <link rel="stylesheet" href="https://hallazzang.github.io/css/normalize.css">
   <link rel="stylesheet" href="https://hallazzang.github.io/css/base.css">
@@ -33,7 +33,7 @@ if (!doNotTrack) {
   <link rel="shortcut icon" href="https://hallazzang.github.io/img/profile.png">
   <title>
     
-      Creating Tray Icons using Go in Windows - Hanjun Kim&#39;s Dev Blog
+      Creating Tray Icons using Go in Windows - Part 1 - Hanjun Kim&#39;s Dev Blog
     
   </title>
 </head>
@@ -71,7 +71,7 @@ if (!doNotTrack) {
       <main>
         
 
-<h1>Creating Tray Icons using Go in Windows</h1>
+<h1>Creating Tray Icons using Go in Windows - Part 1</h1>
 <div class="post-meta">
   <span class="post-date">
     Published at
@@ -247,7 +247,7 @@ But, it&rsquo;s a good habit to wrap an API call into a Go function like so:</p>
 }</code></pre></div>
 <p>In this way, we can keep type signatures for the API and take advantage of IDE&rsquo;s auto-completion.</p>
 
-<h2 id="first-tray-icon">First Tray Icon</h2>
+<h2 id="our-first-tray-icon">Our First Tray Icon</h2>
 
 <p>Now it&rsquo;s time to test if we can create a tray icon.
 Code is so simple:</p>
@@ -476,7 +476,34 @@ data.HIcon = icon</code></pre></div>
 It wasn&rsquo;t that hard, was it?
 Hover your mouse over the tray icon, and check it&rsquo;s not dissapearing anymore.</p>
 
-<p>(Actively writing)</p>
+<h3 id="removing-tray-icon">Removing Tray Icon</h3>
+
+<p>Has anyone noticed that even after our application has exited, the tray icon is still visible in the taskbar?
+And you have to hover your mouse over the icon to remove it from the taskbar.
+You may have experienced this situation several times before, while using other softwares.
+The reason is that we didn&rsquo;t remove the tray icon explicitly.
+It can commonly happen when programmers(like us) forgot to remove tray icons explicitly or the application just crashed and has no chance to run its cleanup routine.</p>
+
+<p>Removing the tray icon is easy, just pass <code>NIM_DELETE</code> to <code>Shell_NotifyIconW</code>:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_DELETE, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+	<span style="color:#24909d">panic</span>(err)
+}</code></pre></div>
+<p>But wait, how does OS know which tray icon we wanna delete?
+It identifies each tray icon using either a combination of (<code>hWnd</code> + <code>uID</code>) or <code>guidItem</code>.
+So in our case, code above can delete our tray icon using <code>hWnd</code> of our main window plus <code>uID</code> which is <code>0</code> by default.</p>
+
+<p>Now we can safely delete the tray icon when our application exits, doing:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">defer</span> <span style="color:#6ab825;font-weight:bold">func</span>() {
+	<span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_DELETE, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		<span style="color:#24909d">panic</span>(err)
+	}
+}()</code></pre></div>
+<h2 id="conclusions">Conclusions</h2>
+
+<p>So far we&rsquo;ve created a tray icon that persists in the taskbar while our application is running.
+In the next part of the tutorial, we&rsquo;ll show some balloon notifications and interact with users.</p>
+
+<p><em>You can find full running example code used in this part at <a href="https://github.com/hallazzang/go-tray-icons-tutorial/tree/master/part1">here</a>.</em></p>
 
 <nav class="post-siblings">
   <div>
