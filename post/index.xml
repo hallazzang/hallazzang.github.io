@@ -20,14 +20,5 @@
       <description>In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with relatively small chunk of Go code.</description>
     </item>
     
-    <item>
-      <title>파이썬 웹 크롤러 만들기 #1</title>
-      <link>https://hallazzang.github.io/post/web-crawling-1/</link>
-      <pubDate>Fri, 11 Oct 2019 22:24:00 +0900</pubDate>
-      
-      <guid>https://hallazzang.github.io/post/web-crawling-1/</guid>
-      <description>파이썬을 사용해 웹 크롤러를 만들어보는 튜토리얼</description>
-    </item>
-    
   </channel>
 </rss>

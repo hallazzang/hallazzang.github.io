@@ -29,23 +29,5 @@
       <description></description>
     </item>
     
-    <item>
-      <title>dev</title>
-      <link>https://hallazzang.github.io/tags/dev/</link>
-      <pubDate>Fri, 11 Oct 2019 22:24:00 +0900</pubDate>
-      
-      <guid>https://hallazzang.github.io/tags/dev/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>python</title>
-      <link>https://hallazzang.github.io/tags/python/</link>
-      <pubDate>Fri, 11 Oct 2019 22:24:00 +0900</pubDate>
-      
-      <guid>https://hallazzang.github.io/tags/python/</guid>
-      <description></description>
-    </item>
-    
   </channel>
 </rss>
