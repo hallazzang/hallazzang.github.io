@@ -3,32 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://hallazzang.github.io/post/go-tray-icons/</loc>
-    <lastmod>2019-10-20T19:15:00+09:00</lastmod>
+    <loc>https://hallazzang.github.io/post/go-tray-icons-2/</loc>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/tags/go/</loc>
-    <lastmod>2019-10-20T19:15:00+09:00</lastmod>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/</loc>
-    <lastmod>2019-10-20T19:15:00+09:00</lastmod>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/post/</loc>
-    <lastmod>2019-10-20T19:15:00+09:00</lastmod>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/tags/</loc>
-    <lastmod>2019-10-20T19:15:00+09:00</lastmod>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hallazzang.github.io/tags/windows/</loc>
+    <lastmod>2019-10-27T23:57:12+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/post/go-tray-icons/</loc>
     <lastmod>2019-10-20T19:15:00+09:00</lastmod>
   </url>
   
