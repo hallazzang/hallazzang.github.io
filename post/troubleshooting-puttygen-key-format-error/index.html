@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+  <head>
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-150418476-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="generator" content="Hugo 0.62.0" />
+  <meta property="og:title" content="Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error" />
+<meta property="og:description" content="My story about troubleshooting PuTTYgen&#39;s &ldquo;Couldn&#39;t load private key (not a recognized key file format)&rdquo; error. In short: save key files with ANSI encoding in Notepad" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/" />
+<meta property="og:image" content="https://hallazzang.github.io/img/profile.png"/>
+<meta property="article:published_time" content="2019-12-24T19:59:28+09:00" />
+<meta property="article:modified_time" content="2019-12-24T19:59:28+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
+
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/normalize.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/base.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/style.css">
+  <link rel="shortcut icon" href="https://hallazzang.github.io/img/profile.png">
+  <title>
+    
+      Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error - Hanjun Kim&#39;s Dev Blog
+    
+  </title>
+</head>
+
+  <body>
+    <nav class="navbar">
+  <div class="container">
+    <a class="navbar-logo" href="/">
+      HALLA.DEV
+    </a>
+    <button class="navbar-toggle-btn">
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+    </button>
+    <ul id="navbar-list" class="navbar-list">
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/">
+            Home
+          </a>
+        </li>
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/about/">
+            About
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+</nav>
+
+    <div class="container">
+      <main>
+        
+
+<h1>Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error</h1>
+<div class="post-meta">
+  <span class="post-date">
+    Published at
+    <time datetime="2019-12-24 19:59:28 &#43;0900 KST">
+      Dec 24, 2019
+    </time>
+  </span>
+</div>
+<hr>
+<h2 id="background">Background</h2>
+<p>I've been using PuTTY to connect to my EC2 instances from my Windows computer.
+I always choose to download the SSH key file from AWS console directly.
+The downloaded key file is a PEM file, and it has human readable format like this:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">-----BEGIN RSA PRIVATE KEY-----
+...some PRIVATE data...
+-----END RSA PRIVATE KEY-----
+</code></pre></div><p>PuTTY cannot consume this key file as-is.
+As suggested in <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html">AWS Docs</a>, PuTTYgen is the preferred tool for converting PEM files to PPK(PuTTY Private Key) files.</p>
+<p>It always worked well and I had no problems with using PuTTYgen.
+But today I accidently deleted my PPK file and had to regenerate it.
+Fortunately I backed up the key file on Dropbox, and was able to send the content of the key file from my phone to my computer, via messenger.
+I opened Notepad, copy-pasted the content and then saved it as <code>key.pem</code> as I always did.
+And tried to load it from PuTTYgen, then I saw this error:</p>
+<figure>
+    <img src="1-error-screenshot.png"
+         alt="PuTTYgen spits out an error"/> <figcaption>
+            <p>PuTTYgen spits out an error</p>
+        </figcaption>
+</figure>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>I thought it might be the problem with the file extension at first, so I changed it to <code>.pem</code>, <code>.ppk</code>, <code>.key</code>, etc. but it didn't help.
+I opened it with Notepad again and checked if I made a mistake copy-pasting it, and it was not the reason too.
+I tried to add a newline at the file's end but still PuTTYgen complains about the file format.</p>
+<p>Then, I suddenly realised that I selected <code>UTF-8</code> encoding when saving the key file.
+I always do that because if I save a file with <code>ANSI</code> encoding, the default option, Korean letters do not show up correctly in other editors - Notepad encodes CJK letters with <code>CP949</code> while other editors expects <code>UTF-8</code> as the default encoding.</p>
+<p>I changed the file encoding to <code>ANSI</code> and PuTTYgen worked happily.</p>
+<h2 id="actual-reason">Actual reason</h2>
+<p>After that, I wondered why the file encoding matters even without CJK letters.
+I opened Notepad again, put this content and saved it as <code>hello.txt</code> with <code>UTF-8</code> encoding:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">hello
+world
+</code></pre></div><p>Then I opened a Python shell in the same directory and ran this script:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#6ab825;font-weight:bold">with</span> <span style="color:#24909d">open</span>(<span style="color:#ed9d13"></span><span style="color:#ed9d13">&#34;</span><span style="color:#ed9d13">hello.txt</span><span style="color:#ed9d13">&#34;</span>, <span style="color:#ed9d13"></span><span style="color:#ed9d13">&#34;</span><span style="color:#ed9d13">rb</span><span style="color:#ed9d13">&#34;</span>) <span style="color:#6ab825;font-weight:bold">as</span> f:
+    <span style="color:#6ab825;font-weight:bold">print</span>(f.read())
+</code></pre></div><p>It printed out following result:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">b&#39;\xef\xbb\xbfhello\r\nworld&#39;
+</code></pre></div><p>Yes, that was the reason, the UTF-8 <a href="https://en.wikipedia.org/wiki/Byte_order_mark">BOM(Byte Order Mask)</a>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>So today I learned that Notepad inserts BOM when saving files with <code>UTF-8</code> encoding.
+<em>This is why one shouldn't use Notepad!</em></p>
+
+<nav class="post-siblings">
+  <div>
+    
+      <a title="Creating Tray Icons using Go in Windows - Part 2" href="/post/go-tray-icons-2/">
+        &laquo; Previous Post
+      </a>
+    
+  </div>
+  <div>
+    
+  </div>
+</nav>
+<script src="https://utteranc.es/client.js"
+        repo="hallazzang/hallazzang.github.io"
+        issue-term="pathname"
+        label="utterances-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+      </main>
+    </div>
+    <script>
+  document.querySelectorAll('.navbar-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = document.querySelector('#navbar-list');
+
+      if (list.classList.contains('visible')) {
+        list.classList.remove('visible');
+      } else {
+        list.classList.add('visible');
+      }
+    })
+  })
+</script>
+
+  </body>
+</html>

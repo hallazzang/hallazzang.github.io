@@ -1,6 +1,21 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://hallazzang.github.io/</loc>
+    <lastmod>2019-12-24T19:59:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/post/</loc>
+    <lastmod>2019-12-24T19:59:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/</loc>
+    <lastmod>2019-12-24T19:59:28+09:00</lastmod>
+  </url>
   
   <url>
     <loc>https://hallazzang.github.io/post/go-tray-icons-2/</loc>
@@ -9,16 +24,6 @@
   
   <url>
     <loc>https://hallazzang.github.io/tags/go/</loc>
-    <lastmod>2019-10-28T12:11:12+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hallazzang.github.io/</loc>
-    <lastmod>2019-10-28T12:11:12+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hallazzang.github.io/post/</loc>
     <lastmod>2019-10-28T12:11:12+09:00</lastmod>
   </url>
   

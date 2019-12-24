@@ -17,13 +17,12 @@ if (!doNotTrack) {
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="generator" content="Hugo 0.58.3" />
+  <meta name="generator" content="Hugo 0.62.0" />
   <meta property="og:title" content="Creating Tray Icons using Go in Windows - Part 1" />
 <meta property="og:description" content="In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with relatively small chunk of Go code." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hallazzang.github.io/post/go-tray-icons/" />
-
-<meta property="og:image" content="https://hallazzang.github.io/img/profile.png" />
+<meta property="og:image" content="https://hallazzang.github.io/img/profile.png"/>
 <meta property="article:published_time" content="2019-10-18T22:02:16+09:00" />
 <meta property="article:modified_time" content="2019-10-20T19:15:00+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
 
@@ -81,14 +80,9 @@ if (!doNotTrack) {
   </span>
 </div>
 <hr>
-
-
 <p>In this tutorial, we will create Windows tray icons(a.k.a. NotifyIcon) with relatively small chunk of Go code.</p>
-
 <h2 id="about-tray-icons">About Tray Icons</h2>
-
 <p>Tray icons are icons that are displayed on the right side of your taskbar. It looks like this:</p>
-
 <figure>
     <img src="1-tray-icons.png"
          alt="Tray icons shown in taskbar"/> <figcaption>
@@ -96,33 +90,25 @@ if (!doNotTrack) {
         </figcaption>
 </figure>
 
-
 <p>You are probably familiar with tray icons already.
-It can be used to inform users about job&rsquo;s current process, and to view them a notification.</p>
-
-<p>Let&rsquo;s create our own using Go!</p>
-
+It can be used to inform users about job's current process, and to view them a notification.</p>
+<p>Let's create our own using Go!</p>
 <h2 id="prerequisites">Prerequisites</h2>
-
-<p>Assuming you&rsquo;ve installed Go already.
+<p>Assuming you've installed Go already.
 We use <code>golang.org/x/sys/windows</code> package in order to follow this tutorial, so install it:</p>
-<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ go get -u golang.org/x/sys/windows</code></pre></div>
-<h2 id="the-api">The API</h2>
-
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ go get -u golang.org/x/sys/windows
+</code></pre></div><h2 id="the-api">The API</h2>
 <p>To create a tray icon and to modify the state or appearance of the icon, all we have to use is <code>Shell_NotifyIcon</code> Windows API.
 It is an API that just sends a message to the OS taskbar as documented in <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw">MSDN</a>:</p>
-
 <blockquote>
-<p>Sends a message to the taskbar&rsquo;s status area.</p>
+<p>Sends a message to the taskbar's status area.</p>
 </blockquote>
-
 <p>Its signature looks like this:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">BOOL <span style="color:#447fcf">Shell_NotifyIconW</span>(
   DWORD            dwMessage,
   PNOTIFYICONDATAW lpData
-);</code></pre></div>
-<p>The first parameter, <code>dwMessage</code> specifies what action to perform. It can be one of <code>NIM_ADD</code>, <code>NIM_MODIFY</code>, <code>NIM_DELETE</code>, <code>NIM_SETFOCUS</code> and <code>NIM_SETVERSION</code>. We primarily use <code>NIM_ADD</code>, <code>NIM_MODIFY</code> and <code>NIM_DELETE</code> for creating, modifying and removing tray icon, respectively.</p>
-
+);
+</code></pre></div><p>The first parameter, <code>dwMessage</code> specifies what action to perform. It can be one of <code>NIM_ADD</code>, <code>NIM_MODIFY</code>, <code>NIM_DELETE</code>, <code>NIM_SETFOCUS</code> and <code>NIM_SETVERSION</code>. We primarily use <code>NIM_ADD</code>, <code>NIM_MODIFY</code> and <code>NIM_DELETE</code> for creating, modifying and removing tray icon, respectively.</p>
 <p>The second parameter, <code>lpData</code> holds information about the action. If we were going to create a new tray icon, we would set <code>szTip</code> and <code>hIcon</code> fields of the struct and then pass it to the API. Its type is <code>PNOTIFYICONDATAW</code>, that is, a pointer to <code>NOTIFYICONDATAW</code> struct:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#6ab825;font-weight:bold">typedef</span> <span style="color:#6ab825;font-weight:bold">struct</span> _NOTIFYICONDATAW {
   DWORD cbSize;
@@ -131,11 +117,11 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
   UINT  uFlags;
   UINT  uCallbackMessage;
   HICON hIcon;
-<span style="color:#cd2828;font-weight:bold">#if ...
+<span style="color:#cd2828;font-weight:bold">#</span><span style="color:#cd2828;font-weight:bold">if ...</span><span style="color:#cd2828;font-weight:bold">
 </span><span style="color:#cd2828;font-weight:bold"></span>  WCHAR szTip[<span style="color:#3677a9">64</span>];
-<span style="color:#cd2828;font-weight:bold">#else
+<span style="color:#cd2828;font-weight:bold">#</span><span style="color:#cd2828;font-weight:bold">else</span><span style="color:#cd2828;font-weight:bold">
 </span><span style="color:#cd2828;font-weight:bold"></span>  WCHAR szTip[<span style="color:#3677a9">128</span>];
-<span style="color:#cd2828;font-weight:bold">#endif
+<span style="color:#cd2828;font-weight:bold">#</span><span style="color:#cd2828;font-weight:bold">endif</span><span style="color:#cd2828;font-weight:bold">
 </span><span style="color:#cd2828;font-weight:bold"></span>  DWORD dwState;
   DWORD dwStateMask;
   WCHAR szInfo[<span style="color:#3677a9">256</span>];
@@ -147,21 +133,15 @@ It is an API that just sends a message to the OS taskbar as documented in <a hre
   DWORD dwInfoFlags;
   GUID  guidItem;
   HICON hBalloonIcon;
-} NOTIFYICONDATAW, *PNOTIFYICONDATAW;</code></pre></div>
-<p>This struct may look scary at first cause it has lots of fields, but only some combinations of those are actually used in a single API call.</p>
-
+} NOTIFYICONDATAW, *PNOTIFYICONDATAW;
+</code></pre></div><p>This struct may look scary at first cause it has lots of fields, but only some combinations of those are actually used in a single API call.</p>
 <p>For example, if you want to create a new tray icon in taskbar, you would set <code>dwMessage</code> to <code>NIM_ADD</code> and set an icon handle for <code>hIcon</code> field of <code>NOTIFYICONDATA</code> struct which <code>lpData</code> points to.</p>
-
 <h2 id="types-constants-and-procedures">Types, Constants and Procedures</h2>
-
 <p>In order to interact with Windows APIs using Go, we should define proper types and constants that is compatible with Windows API, then find correct procedures from DLLs.</p>
-
 <p>I recommend you to keep these definitions under separate file, e.g. <code>winapi.go</code>.
 This helps us to concentrate on the main logic.</p>
-
 <h3 id="constants">Constants</h3>
-
-<p>Define some constants that we&rsquo;re going to use, as described in MSDN:</p>
+<p>Define some constants that we're going to use, as described in MSDN:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">const</span> (
 	NIM_ADD        = <span style="color:#3677a9">0x00000000</span>
 	NIM_MODIFY     = <span style="color:#3677a9">0x00000001</span>
@@ -194,9 +174,8 @@ This helps us to concentrate on the main logic.</p>
 	NIN_BALLOONSHOW      = <span style="color:#3677a9">0x0402</span>
 	NIN_BALLOONTIMEOUT   = <span style="color:#3677a9">0x0404</span>
 	NIN_BALLOONUSERCLICK = <span style="color:#3677a9">0x0405</span>
-)</code></pre></div>
-<p>These are from <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw">Shell_NotifyIconW</a> and <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataw">NOTIFYICONDATAW</a> documentation.</p>
-
+)
+</code></pre></div><p>These are from <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw">Shell_NotifyIconW</a> and <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataw">NOTIFYICONDATAW</a> documentation.</p>
 <h3 id="types">Types</h3>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> NOTIFYICONDATA <span style="color:#6ab825;font-weight:bold">struct</span> {
 	CbSize           <span style="color:#6ab825;font-weight:bold">uint32</span>
@@ -214,26 +193,24 @@ This helps us to concentrate on the main logic.</p>
 	DwInfoFlags      <span style="color:#6ab825;font-weight:bold">uint32</span>
 	GuidItem         GUID
 	HBalloonIcon     <span style="color:#6ab825;font-weight:bold">uintptr</span>
-}</code></pre></div>
-<p>As you see above, there is also <a href="https://docs.microsoft.com/en-us/windows/win32/api/guiddef/ns-guiddef-guid"><code>GUID</code></a> struct. Let&rsquo;s define this too:</p>
+}
+</code></pre></div><p>As you see above, there is also <a href="https://docs.microsoft.com/en-us/windows/win32/api/guiddef/ns-guiddef-guid"><code>GUID</code></a> struct. Let's define this too:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> GUID <span style="color:#6ab825;font-weight:bold">struct</span> {
 	Data1 <span style="color:#6ab825;font-weight:bold">uint32</span>
 	Data2 <span style="color:#6ab825;font-weight:bold">uint16</span>
 	Data3 <span style="color:#6ab825;font-weight:bold">uint16</span>
 	Data4 [<span style="color:#3677a9">8</span>]<span style="color:#6ab825;font-weight:bold">byte</span>
-}</code></pre></div>
-<p>So we are all set for the data types.</p>
-
+}
+</code></pre></div><p>So we are all set for the data types.</p>
 <h3 id="procedures">Procedures</h3>
-
 <p><code>Shell_NotifyIconW</code> is in the <code>shell32.dll</code> as documented in MSDN.
-We&rsquo;re going to load <code>shell32.dll</code> first and find <code>Shell_NotifyIconW</code>&rsquo;s address. Store these as global variable:</p>
+We're going to load <code>shell32.dll</code> first and find <code>Shell_NotifyIconW</code>'s address. Store these as global variable:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> (
 	libshell32 = windows.<span style="color:#447fcf">NewLazySystemDLL</span>(<span style="color:#ed9d13">&#34;shell32.dll&#34;</span>)
 	procShell_NotifyIconW = libshell32.<span style="color:#447fcf">NewProc</span>(<span style="color:#ed9d13">&#34;Shell_NotifyIconW&#34;</span>)
-)</code></pre></div>
-<p>Good. Now we could call the API directly by using: <code>procShell_NotifyIconW.Call()</code>.
-But, it&rsquo;s a good habit to wrap an API call into a Go function like so:</p>
+)
+</code></pre></div><p>Good. Now we could call the API directly by using: <code>procShell_NotifyIconW.Call()</code>.
+But, it's a good habit to wrap an API call into a Go function like so:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">Shell_NotifyIcon</span>(
 	dwMessage <span style="color:#6ab825;font-weight:bold">uint32</span>,
 	lpData *NOTIFYICONDATA) (<span style="color:#6ab825;font-weight:bold">int32</span>, <span style="color:#6ab825;font-weight:bold">error</span>) {
@@ -244,12 +221,10 @@ But, it&rsquo;s a good habit to wrap an API call into a Go function like so:</p>
 		<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>, err
 	}
 	<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#24909d">int32</span>(r), <span style="color:#6ab825;font-weight:bold">nil</span>
-}</code></pre></div>
-<p>In this way, we can keep type signatures for the API and take advantage of IDE&rsquo;s auto-completion.</p>
-
+}
+</code></pre></div><p>In this way, we can keep type signatures for the API and take advantage of IDE's auto-completion.</p>
 <h2 id="our-first-tray-icon">Our First Tray Icon</h2>
-
-<p>Now it&rsquo;s time to test if we can create a tray icon.
+<p>Now it's time to test if we can create a tray icon.
 Code is so simple:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
 
@@ -257,23 +232,19 @@ data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="colo
 
 <span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_ADD, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<p>If it runs without panic, a tray icon would be shown in taskbar.
-If you&rsquo;re using Windows 10, you would see nothing but a transparent box, because we didn&rsquo;t set an icon for it.
-Windows 7 users can see a default application icon, but it&rsquo;s good to have our own icon displayed.</p>
-
+}
+</code></pre></div><p>If it runs without panic, a tray icon would be shown in taskbar.
+If you're using Windows 10, you would see nothing but a transparent box, because we didn't set an icon for it.
+Windows 7 users can see a default application icon, but it's good to have our own icon displayed.</p>
 <h3 id="loading-icon">Loading Icon</h3>
-
-<p>We&rsquo;re gonna load an icon resource from a file.
-You can use any icon you want as long as it&rsquo;s an <code>.ico</code> file.
+<p>We're gonna load an icon resource from a file.
+You can use any icon you want as long as it's an <code>.ico</code> file.
 Or you can use a sample icon: <a href="https://github.com/hallazzang/go-tray-icons-tutorial/raw/master/icon.ico">Download Sample Icon</a>.
 Just place it under the same directory where your <code>main.go</code> lives in.</p>
-
 <p>We use <code>LoadImageW</code> API to load icon from a file.
 It is in <code>user32.dll</code>, and to load it, we do the same process that we have done for <code>Shell_NotifyIconW</code>.
-To keep the tutorial concise, I&rsquo;m not gonna put the whole API and constant definitions here.
+To keep the tutorial concise, I'm not gonna put the whole API and constant definitions here.
 You can find the full code for <code>LoadImage</code> <a href="https://github.com/hallazzang/go-tray-icons-tutorial/blob/66beefdbdfeccff1f4b5f9170153758fbb2ef83c/winapi.go#L158-L175">here</a>.</p>
-
 <p>You can then use <code>LoadImage</code> to load our icon file like this:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">icon, err := <span style="color:#447fcf">LoadImage</span>(
 	<span style="color:#3677a9">0</span>,
@@ -284,10 +255,9 @@ You can find the full code for <code>LoadImage</code> <a href="https://github.co
 	LR_DEFAULTSIZE|LR_LOADFROMFILE)
 <span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<h3 id="setting-icon">Setting Icon</h3>
-
-<p>Let&rsquo;s set an icon for our tray icon:</p>
+}
+</code></pre></div><h3 id="setting-icon">Setting Icon</h3>
+<p>Let's set an icon for our tray icon:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
 
 data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(data))
@@ -307,9 +277,8 @@ data.HIcon = icon
 
 <span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_ADD, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<p>This will result in:</p>
-
+}
+</code></pre></div><p>This will result in:</p>
 <figure>
     <img src="2-custom-icon.png"
          alt="Custom icon shown in taskbar"/> <figcaption>
@@ -317,24 +286,18 @@ data.HIcon = icon
         </figcaption>
 </figure>
 
-
 <p>Cool! But wait, if you hover your mouse on the icon, it will disappear.
-This is because it doesn&rsquo;t have an associated window that receives window messages for tray icon.
+This is because it doesn't have an associated window that receives window messages for tray icon.
 To fix this problem, we should create an empty window which acts as a message receiver.</p>
-
 <h3 id="creating-an-associated-window">Creating an Associated Window</h3>
-
 <p>To be honest, this part is truely a mess.
 Just to create a single empty window, we have to import at least these APIs:</p>
-
 <ul>
 <li><code>RegisterClassExW</code></li>
 <li><code>CreateWindowExW</code></li>
 <li><code>GetModuleHandleW</code></li>
 </ul>
-
 <p>And to make the window visible and interactable, we need these:</p>
-
 <ul>
 <li><code>GetMessageW</code></li>
 <li><code>TranslateMessage</code></li>
@@ -343,13 +306,11 @@ Just to create a single empty window, we have to import at least these APIs:</p>
 <li><code>PostQuitMessage</code></li>
 <li><code>ShowWindow</code></li>
 </ul>
-
 <p>And also constants and types.
 I can even write a separate tutorial about creating a simple window.
-So I&rsquo;m gonna omit the definitions in this tutorial.
+So I'm gonna omit the definitions in this tutorial.
 Of course you can find the full code at <a href="https://github.com/hallazzang/go-tray-icons-tutorial/blob/66beefdbdfeccff1f4b5f9170153758fbb2ef83c/winapi.go#L177-L267">here</a>.</p>
-
-<p>If you&rsquo;re all set with those definitions, let&rsquo;s create a window. Here&rsquo;s the function that creates main window:</p>
+<p>If you're all set with those definitions, let's create a window. Here's the function that creates main window:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">createMainWindow</span>() (<span style="color:#6ab825;font-weight:bold">uintptr</span>, <span style="color:#6ab825;font-weight:bold">error</span>) {
 	hInstance, err := <span style="color:#447fcf">GetModuleHandle</span>(<span style="color:#6ab825;font-weight:bold">nil</span>)
 	<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
@@ -386,12 +347,11 @@ Of course you can find the full code at <a href="https://github.com/hallazzang/g
 	}
 
 	<span style="color:#6ab825;font-weight:bold">return</span> hwnd, <span style="color:#6ab825;font-weight:bold">nil</span>
-}</code></pre></div>
-<p>I&rsquo;m not gonna go deeper with it, since it&rsquo;s just a boilerplate needed for creating an empty window.</p>
-
+}
+</code></pre></div><p>I'm not gonna go deeper with it, since it's just a boilerplate needed for creating an empty window.</p>
 <p>Look at how we use <code>wndProc</code> for <code>WNDCLASSEX.LpfnWndProc</code>:</p>
-<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">wcex.LpfnWndProc = windows.<span style="color:#447fcf">NewCallback</span>(wndProc)</code></pre></div>
-<p>This <code>wndProc</code> is a callback function that handles window messages for our main window, and tray icon window. Here&rsquo;s the definition of it:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">wcex.LpfnWndProc = windows.<span style="color:#447fcf">NewCallback</span>(wndProc)
+</code></pre></div><p>This <code>wndProc</code> is a callback function that handles window messages for our main window, and tray icon window. Here's the definition of it:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">wndProc</span>(hWnd <span style="color:#6ab825;font-weight:bold">uintptr</span>, msg <span style="color:#6ab825;font-weight:bold">uint32</span>, wParam, lParam <span style="color:#6ab825;font-weight:bold">uintptr</span>) <span style="color:#6ab825;font-weight:bold">uintptr</span> {
 	<span style="color:#6ab825;font-weight:bold">switch</span> msg {
 	<span style="color:#6ab825;font-weight:bold">case</span> WM_DESTROY:
@@ -401,12 +361,11 @@ Of course you can find the full code at <a href="https://github.com/hallazzang/g
 		<span style="color:#6ab825;font-weight:bold">return</span> r
 	}
 	<span style="color:#6ab825;font-weight:bold">return</span> <span style="color:#3677a9">0</span>
-}</code></pre></div>
-<p>What it does is so simple:
+}
+</code></pre></div><p>What it does is so simple:
 if message is <code>WM_DESTROY</code>, make our program to quit and for other messages, just leave the default behavior untouched.</p>
-
 <p>And last thing to make our window interactable, we should run a message loop.
-Think of it as an infinite loop which grabs window messages sent from OS to our application and dispatches it to proper window. It&rsquo;s code is simple enough:</p>
+Think of it as an infinite loop which grabs window messages sent from OS to our application and dispatches it to proper window. It's code is simple enough:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> msg MSG
 
 <span style="color:#6ab825;font-weight:bold">for</span> {
@@ -420,20 +379,17 @@ Think of it as an infinite loop which grabs window messages sent from OS to our 
 
 	<span style="color:#447fcf">TranslateMessage</span>(&amp;msg)
 	<span style="color:#447fcf">DispatchMessage</span>(&amp;msg)
-}</code></pre></div>
-<p>Note that the message loop should go at the end of our main function.</p>
-
+}
+</code></pre></div><p>Note that the message loop should go at the end of our main function.</p>
 <h3 id="tray-icon-associated-with-window">Tray Icon Associated with Window</h3>
-
 <p>Now we are all ready to go.
-Let&rsquo;s create our non-disappearing tray icon!</p>
-
+Let's create our non-disappearing tray icon!</p>
 <p>First, create an empty main window:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">hwnd, err := <span style="color:#447fcf">createMainWindow</span>()
 <span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<p>Then prepare our <code>NOTIFYICONDATA</code> struct(Note that we set <code>HWnd</code> member with the window handle we created above):</p>
+}
+</code></pre></div><p>Then prepare our <code>NOTIFYICONDATA</code> struct(Note that we set <code>HWnd</code> member with the window handle we created above):</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
 
 data.CbSize = <span style="color:#24909d">uint32</span>(unsafe.<span style="color:#447fcf">Sizeof</span>(data))
@@ -450,12 +406,12 @@ icon, err := <span style="color:#447fcf">LoadImage</span>(
 <span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
 }
-data.HIcon = icon</code></pre></div>
-<p>And let it be displayed:</p>
+data.HIcon = icon
+</code></pre></div><p>And let it be displayed:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_ADD, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<p>Finally, show our main window so that users can see and close the window, then run the message loop:</p>
+}
+</code></pre></div><p>Finally, show our main window so that users can see and close the window, then run the message loop:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#447fcf">ShowWindow</span>(hwnd, SW_SHOW)
 
 <span style="color:#6ab825;font-weight:bold">var</span> msg MSG
@@ -471,40 +427,33 @@ data.HIcon = icon</code></pre></div>
 
 	<span style="color:#447fcf">TranslateMessage</span>(&amp;msg)
 	<span style="color:#447fcf">DispatchMessage</span>(&amp;msg)
-}</code></pre></div>
-<p>And that&rsquo;s it.
-It wasn&rsquo;t that hard, was it?
-Hover your mouse over the tray icon, and check it&rsquo;s not dissapearing anymore.</p>
-
+}
+</code></pre></div><p>And that's it.
+It wasn't that hard, was it?
+Hover your mouse over the tray icon, and check it's not dissapearing anymore.</p>
 <h3 id="removing-tray-icon">Removing Tray Icon</h3>
-
 <p>Has anyone noticed that even after our application has exited, the tray icon is still visible in the taskbar?
 And you have to hover your mouse over the icon to remove it from the taskbar.
 You may have experienced this situation several times before, while using other softwares.
-The reason is that we didn&rsquo;t remove the tray icon explicitly.
+The reason is that we didn't remove the tray icon explicitly.
 It can commonly happen when programmers(like us) forgot to remove tray icons explicitly or the application just crashed and has no chance to run its cleanup routine.</p>
-
 <p>Removing the tray icon is easy, just pass <code>NIM_DELETE</code> to <code>Shell_NotifyIconW</code>:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_DELETE, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 	<span style="color:#24909d">panic</span>(err)
-}</code></pre></div>
-<p>But wait, how does OS know which tray icon we wanna delete?
+}
+</code></pre></div><p>But wait, how does OS know which tray icon we wanna delete?
 It identifies each tray icon using either a combination of (<code>hWnd</code> + <code>uID</code>) or <code>guidItem</code>.
 So in our case, code above can delete our tray icon using <code>hWnd</code> of our main window plus <code>uID</code> which is <code>0</code> by default.</p>
-
 <p>Now we can safely delete the tray icon when our application exits, doing:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">defer</span> <span style="color:#6ab825;font-weight:bold">func</span>() {
 	<span style="color:#6ab825;font-weight:bold">if</span> _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_DELETE, &amp;data); err != <span style="color:#6ab825;font-weight:bold">nil</span> {
 		<span style="color:#24909d">panic</span>(err)
 	}
-}()</code></pre></div>
-<h2 id="conclusion">Conclusion</h2>
-
-<p>So far we&rsquo;ve created a tray icon that persists in the taskbar while our application is running.
-In the next part of the tutorial, we&rsquo;ll show some balloon notifications and interact with users.</p>
-
+}()
+</code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>So far we've created a tray icon that persists in the taskbar while our application is running.
+In the next part of the tutorial, we'll show some balloon notifications and interact with users.</p>
 <p><em>You can find full running example code used in this part at <a href="https://github.com/hallazzang/go-tray-icons-tutorial/tree/master/part1">here</a>.</em></p>
-
 <p>Next: <a href="/post/go-tray-icons-2/">Creating Tray Icons using Go in Windows - Part 2</a></p>
 
 <nav class="post-siblings">

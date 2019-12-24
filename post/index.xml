@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Hanjun Kim&#39;s Dev Blog</title>
@@ -6,10 +6,19 @@
     <description>Recent content in Posts on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
-    <lastBuildDate>Sun, 20 Oct 2019 18:41:12 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 24 Dec 2019 19:59:28 +0900</lastBuildDate>
     
 	<atom:link href="https://hallazzang.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error</title>
+      <link>https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/</link>
+      <pubDate>Tue, 24 Dec 2019 19:59:28 +0900</pubDate>
+      
+      <guid>https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/</guid>
+      <description>My story about troubleshooting PuTTYgen&#39;s &amp;ldquo;Couldn&#39;t load private key (not a recognized key file format)&amp;rdquo; error. In short: save key files with &lt;code&gt;ANSI&lt;/code&gt; encoding in Notepad</description>
+    </item>
     
     <item>
       <title>Creating Tray Icons using Go in Windows - Part 2</title>
