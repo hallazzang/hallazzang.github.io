@@ -17,9 +17,9 @@ if (!doNotTrack) {
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="generator" content="Hugo 0.62.0" />
+  <meta name="generator" content="Hugo 0.74.2" />
   <meta property="og:title" content="Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error" />
-<meta property="og:description" content="My story about troubleshooting PuTTYgen&#39;s &ldquo;Couldn&#39;t load private key (not a recognized key file format)&rdquo; error. In short: save key files with ANSI encoding in Notepad" />
+<meta property="og:description" content="My story about troubleshooting PuTTYgen&rsquo;s &ldquo;Couldn&rsquo;t load private key (not a recognized key file format)&rdquo; error. In short: save key files with ANSI encoding in Notepad" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/" />
 <meta property="og:image" content="https://hallazzang.github.io/img/profile.png"/>
@@ -81,7 +81,7 @@ if (!doNotTrack) {
 </div>
 <hr>
 <h2 id="background">Background</h2>
-<p>I've been using PuTTY to connect to my EC2 instances from my Windows computer.
+<p>I&rsquo;ve been using PuTTY to connect to my EC2 instances from my Windows computer.
 I always choose to download the SSH key file from AWS console directly.
 The downloaded key file is a PEM file, and it has human readable format like this:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">-----BEGIN RSA PRIVATE KEY-----
@@ -102,9 +102,9 @@ And tried to load it from PuTTYgen, then I saw this error:</p>
 </figure>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
-<p>I thought it might be the problem with the file extension at first, so I changed it to <code>.pem</code>, <code>.ppk</code>, <code>.key</code>, etc. but it didn't help.
+<p>I thought it might be the problem with the file extension at first, so I changed it to <code>.pem</code>, <code>.ppk</code>, <code>.key</code>, etc. but it didn&rsquo;t help.
 I opened it with Notepad again and checked if I made a mistake copy-pasting it, and it was not the reason too.
-I tried to add a newline at the file's end but still PuTTYgen complains about the file format.</p>
+I tried to add a newline at the file&rsquo;s end but still PuTTYgen complains about the file format.</p>
 <p>Then, I suddenly realised that I selected <code>UTF-8</code> encoding when saving the key file.
 I always do that because if I save a file with <code>ANSI</code> encoding, the default option, Korean letters do not show up correctly in other editors - Notepad encodes CJK letters with <code>CP949</code> while other editors expects <code>UTF-8</code> as the default encoding.</p>
 <p>I changed the file encoding to <code>ANSI</code> and PuTTYgen worked happily.</p>
@@ -114,14 +114,14 @@ I opened Notepad again, put this content and saved it as <code>hello.txt</code> 
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">hello
 world
 </code></pre></div><p>Then I opened a Python shell in the same directory and ran this script:</p>
-<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#6ab825;font-weight:bold">with</span> <span style="color:#24909d">open</span>(<span style="color:#ed9d13"></span><span style="color:#ed9d13">&#34;</span><span style="color:#ed9d13">hello.txt</span><span style="color:#ed9d13">&#34;</span>, <span style="color:#ed9d13"></span><span style="color:#ed9d13">&#34;</span><span style="color:#ed9d13">rb</span><span style="color:#ed9d13">&#34;</span>) <span style="color:#6ab825;font-weight:bold">as</span> f:
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#6ab825;font-weight:bold">with</span> <span style="color:#24909d">open</span>(<span style="color:#ed9d13">&#34;hello.txt&#34;</span>, <span style="color:#ed9d13">&#34;rb&#34;</span>) <span style="color:#6ab825;font-weight:bold">as</span> f:
     <span style="color:#6ab825;font-weight:bold">print</span>(f.read())
 </code></pre></div><p>It printed out following result:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-plain" data-lang="plain">b&#39;\xef\xbb\xbfhello\r\nworld&#39;
 </code></pre></div><p>Yes, that was the reason, the UTF-8 <a href="https://en.wikipedia.org/wiki/Byte_order_mark">BOM(Byte Order Mask)</a>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>So today I learned that Notepad inserts BOM when saving files with <code>UTF-8</code> encoding.
-<em>This is why one shouldn't use Notepad!</em></p>
+<em>This is why one shouldn&rsquo;t use Notepad!</em></p>
 
 <nav class="post-siblings">
   <div>
@@ -132,6 +132,10 @@ world
     
   </div>
   <div>
+    
+      <a title="Tracking Go HTTP Redirection History" href="/post/go-http-redirection-history/">
+        Next Post &raquo;
+      </a>
     
   </div>
 </nav>

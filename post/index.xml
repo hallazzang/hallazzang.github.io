@@ -6,10 +6,19 @@
     <description>Recent content in Posts on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
-    <lastBuildDate>Tue, 24 Dec 2019 19:59:28 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2020 18:55:18 +0900</lastBuildDate>
     
 	<atom:link href="https://hallazzang.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tracking Go HTTP Redirection History</title>
+      <link>https://hallazzang.github.io/post/go-http-redirection-history/</link>
+      <pubDate>Sat, 18 Jul 2020 18:55:18 +0900</pubDate>
+      
+      <guid>https://hallazzang.github.io/post/go-http-redirection-history/</guid>
+      <description>This post will explain how to track HTTP redirection history in Golang.</description>
+    </item>
     
     <item>
       <title>Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error</title>
@@ -17,7 +26,7 @@
       <pubDate>Tue, 24 Dec 2019 19:59:28 +0900</pubDate>
       
       <guid>https://hallazzang.github.io/post/troubleshooting-puttygen-key-format-error/</guid>
-      <description>My story about troubleshooting PuTTYgen&#39;s &amp;ldquo;Couldn&#39;t load private key (not a recognized key file format)&amp;rdquo; error. In short: save key files with &lt;code&gt;ANSI&lt;/code&gt; encoding in Notepad</description>
+      <description>My story about troubleshooting PuTTYgen&amp;rsquo;s &amp;ldquo;Couldn&amp;rsquo;t load private key (not a recognized key file format)&amp;rdquo; error. In short: save key files with &lt;code&gt;ANSI&lt;/code&gt; encoding in Notepad</description>
     </item>
     
     <item>

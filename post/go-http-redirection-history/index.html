@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-150418476-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="generator" content="Hugo 0.74.2" />
+  <meta property="og:title" content="Tracking Go HTTP Redirection History" />
+<meta property="og:description" content="This post will explain how to track HTTP redirection history in Golang." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hallazzang.github.io/post/go-http-redirection-history/" />
+<meta property="og:image" content="https://hallazzang.github.io/img/profile.png"/>
+<meta property="article:published_time" content="2020-07-18T18:55:18+09:00" />
+<meta property="article:modified_time" content="2020-07-18T18:55:18+09:00" /><meta property="og:site_name" content="Hanjun Kim&#39;s Dev Blog" />
+
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/normalize.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/base.css">
+  <link rel="stylesheet" href="https://hallazzang.github.io/css/style.css">
+  <link rel="shortcut icon" href="https://hallazzang.github.io/img/profile.png">
+  <title>
+    
+      Tracking Go HTTP Redirection History - Hanjun Kim&#39;s Dev Blog
+    
+  </title>
+</head>
+
+  <body>
+    <nav class="navbar">
+  <div class="container">
+    <a class="navbar-logo" href="/">
+      HALLA.DEV
+    </a>
+    <button class="navbar-toggle-btn">
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+      <span class="toggle-icon-bar"></span>
+    </button>
+    <ul id="navbar-list" class="navbar-list">
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/">
+            Home
+          </a>
+        </li>
+      
+        <li class="navbar-item">
+          <a class="navbar-link" href="/about/">
+            About
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+</nav>
+
+    <div class="container">
+      <main>
+        
+
+<h1>Tracking Go HTTP Redirection History</h1>
+<div class="post-meta">
+  <span class="post-date">
+    Published at
+    <time datetime="2020-07-18 18:55:18 &#43;0900 KST">
+      Jul 18, 2020
+    </time>
+  </span>
+</div>
+<hr>
+<p>This post will explain how to track HTTP redirection history in Golang.</p>
+<p>(Prelude WIP)</p>
+<h2 id="solution">Solution</h2>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">Redirections</span>(resp *http.Response) (history []*http.Request) {
+	<span style="color:#6ab825;font-weight:bold">for</span> resp != <span style="color:#6ab825;font-weight:bold">nil</span> {
+		req := resp.Request
+		history = <span style="color:#24909d">append</span>(history, req)
+		resp = req.Response
+	}
+	<span style="color:#6ab825;font-weight:bold">return</span>
+}
+</code></pre></div><p>This returns all requests made for a particular response in a slice.</p>
+<p>Note that the last request(that eventually made the response) comes first in the slice, so to reverse the order, use this technique(take from <a href="https://github.com/golang/go/wiki/SliceTricks#reversing):">https://github.com/golang/go/wiki/SliceTricks#reversing):</a></p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">for</span> l, r := <span style="color:#3677a9">0</span>, <span style="color:#24909d">len</span>(history)-<span style="color:#3677a9">1</span>; l &lt; r; l, r = l+<span style="color:#3677a9">1</span>, r-<span style="color:#3677a9">1</span> {
+    history[l], history[r] = history[r], history[l]
+}
+</code></pre></div><p>Now you can use this function as:</p>
+<div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">resp, err := http.<span style="color:#447fcf">Get</span>(<span style="color:#ed9d13">&#34;http://naver.com&#34;</span>)
+<span style="color:#6ab825;font-weight:bold">if</span> err != <span style="color:#6ab825;font-weight:bold">nil</span> {
+    <span style="color:#24909d">panic</span>(err)
+}
+<span style="color:#6ab825;font-weight:bold">defer</span> resp.Body.<span style="color:#447fcf">Close</span>()
+<span style="color:#6ab825;font-weight:bold">for</span> _, req := <span style="color:#6ab825;font-weight:bold">range</span> <span style="color:#447fcf">Redirections</span>(resp) {
+    fmt.<span style="color:#447fcf">Println</span>(req.URL)
+}
+<span style="color:#999;font-style:italic">// Output:
+</span><span style="color:#999;font-style:italic">// https://www.naver.com/
+</span><span style="color:#999;font-style:italic">// http://www.naver.com/
+</span><span style="color:#999;font-style:italic">// http://naver.com
+</span></code></pre></div><p>(Due to <a href="https://github.com/postmanlabs/httpbin/issues/617">a temporal issue</a> with httpbin,
+I chose the famous Korean search engine <strong>Naver</strong> which redirects users to <code>https://</code> page using HTTP redirects)</p>
+
+<nav class="post-siblings">
+  <div>
+    
+      <a title="Troubleshooting PuTTYgen &#34;Couldn&#39;t load private key (not a recognized key file format)&#34; Error" href="/post/troubleshooting-puttygen-key-format-error/">
+        &laquo; Previous Post
+      </a>
+    
+  </div>
+  <div>
+    
+  </div>
+</nav>
+<script src="https://utteranc.es/client.js"
+        repo="hallazzang/hallazzang.github.io"
+        issue-term="pathname"
+        label="utterances-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+      </main>
+    </div>
+    <script>
+  document.querySelectorAll('.navbar-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const list = document.querySelector('#navbar-list');
+
+      if (list.classList.contains('visible')) {
+        list.classList.remove('visible');
+      } else {
+        list.classList.add('visible');
+      }
+    })
+  })
+</script>
+
+  </body>
+</html>

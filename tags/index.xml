@@ -6,7 +6,7 @@
     <description>Recent content in Tags on Hanjun Kim&#39;s Dev Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
-    <lastBuildDate>Sun, 20 Oct 2019 18:41:12 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2020 18:55:18 +0900</lastBuildDate>
     
 	<atom:link href="https://hallazzang.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,9 +14,18 @@
     <item>
       <title>go</title>
       <link>https://hallazzang.github.io/tags/go/</link>
-      <pubDate>Sun, 20 Oct 2019 18:41:12 +0900</pubDate>
+      <pubDate>Sat, 18 Jul 2020 18:55:18 +0900</pubDate>
       
       <guid>https://hallazzang.github.io/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>http</title>
+      <link>https://hallazzang.github.io/tags/http/</link>
+      <pubDate>Sat, 18 Jul 2020 18:55:18 +0900</pubDate>
+      
+      <guid>https://hallazzang.github.io/tags/http/</guid>
       <description></description>
     </item>
     

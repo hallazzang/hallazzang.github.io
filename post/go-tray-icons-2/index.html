@@ -17,7 +17,7 @@ if (!doNotTrack) {
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="generator" content="Hugo 0.62.0" />
+  <meta name="generator" content="Hugo 0.74.2" />
   <meta property="og:title" content="Creating Tray Icons using Go in Windows - Part 2" />
 <meta property="og:description" content="Continued from the last post - Creating Tray Icons using Go in Windows - Part 1, we will show some balloon notificationsto users and interact with them." />
 <meta property="og:type" content="article" />
@@ -81,7 +81,7 @@ if (!doNotTrack) {
 </div>
 <hr>
 <p>Continued from the last post - <a href="/post/go-tray-icons/">Creating Tray Icons using Go in Windows - Part 1</a>, we will show some balloon notificationsto users and interact with them.</p>
-<p>But before we start, let's add some tooltip for our tray icon first.</p>
+<p>But before we start, let&rsquo;s add some tooltip for our tray icon first.</p>
 <h2 id="tooltip">Tooltip</h2>
 <p>Tooltips is a text displayed when you hover mouse over the tray icon.
 It looks like this:</p>
@@ -92,14 +92,14 @@ It looks like this:</p>
         </figcaption>
 </figure>
 
-<p>A tooltip helps users to identify what application the tray icon belongs to. It's really easy to add one, just set <code>szTip</code> member of <code>NOTIFYICONDATA</code> struct and set <code>NIF_TIP</code> flag for <code>uFlags</code> member.</p>
+<p>A tooltip helps users to identify what application the tray icon belongs to. It&rsquo;s really easy to add one, just set <code>szTip</code> member of <code>NOTIFYICONDATA</code> struct and set <code>NIF_TIP</code> flag for <code>uFlags</code> member.</p>
 <p>To set <code>sz*</code> members(UTF-16 string, type of <code>[...]uint16</code>), we use <code>windows.StringToUTF16</code>.
 It converts UTF-8 encoded Go string(<code>string</code>) into UTF-16 encoded word slice(<code>[]uint16</code>).</p>
-<p>Note that it's actually <a href="https://godoc.org/golang.org/x/sys/windows#StringToUTF16">deprecated</a>:</p>
+<p>Note that it&rsquo;s actually <a href="https://godoc.org/golang.org/x/sys/windows#StringToUTF16">deprecated</a>:</p>
 <blockquote>
 <p>StringToUTF16 is deprecated. Use UTF16FromString instead. If s contains a NUL byte this function panics instead of returning an error.</p>
 </blockquote>
-<p>But in this tutorial I'll use <code>StringToUTF16</code> instead of <code>UTF16FromString</code>, because using the later one is too verbose:</p>
+<p>But in this tutorial I&rsquo;ll use <code>StringToUTF16</code> instead of <code>UTF16FromString</code>, because using the later one is too verbose:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#999;font-style:italic">// Using StringToUTF16
 </span><span style="color:#999;font-style:italic"></span><span style="color:#447fcf">Foo</span>(<span style="color:#447fcf">StringToUTF16</span>(<span style="color:#ed9d13">&#34;Bar&#34;</span>))
 
@@ -109,10 +109,10 @@ It converts UTF-8 encoded Go string(<code>string</code>) into UTF-16 encoded wor
     <span style="color:#24909d">panic</span>(err)
 }
 <span style="color:#447fcf">Foo</span>(u)
-</code></pre></div><p><strong>IMPORTANT NOTE</strong>: If you're writing production level code, prefer <code>UTF16FromString</code> though.</p>
+</code></pre></div><p><strong>IMPORTANT NOTE</strong>: If you&rsquo;re writing production level code, prefer <code>UTF16FromString</code> though.</p>
 <p>So to set a tooltip for our tray icon, this short code is just enough:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#24909d">copy</span>(data.SzTip[:], windows.<span style="color:#447fcf">StringToUTF16</span>(<span style="color:#ed9d13">&#34;Tray Icons!&#34;</span>))
-</code></pre></div><p>And don't forget to set <code>NIF_TIP</code> flag or the <code>szTip</code> field we set will be ignored:</p>
+</code></pre></div><p>And don&rsquo;t forget to set <code>NIF_TIP</code> flag or the <code>szTip</code> field we set will be ignored:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">data.UFlags = NIF_ICON | NIF_TIP
 </code></pre></div><p>So now the code should look like:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
@@ -178,19 +178,19 @@ data.HIcon = icon
     <span style="color:#24909d">panic</span>(err)
 }
 </code></pre></div><h2 id="balloon-notification-icons">Balloon Notification Icons</h2>
-<p>Along with balloon notifcations, you can optionally set notification's icon.
-In Windows 10, if you don't specify an icon when firing a balloon notification, it'll use the tray icon's icon as a default.
+<p>Along with balloon notifcations, you can optionally set notification&rsquo;s icon.
+In Windows 10, if you don&rsquo;t specify an icon when firing a balloon notification, it&rsquo;ll use the tray icon&rsquo;s icon as a default.
 Take a look at possible options at <a href="https://docs.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataw#niif_none-0x00000000">here</a>.</p>
 <h2 id="updating-tray-icon">Updating Tray Icon</h2>
 <p>Now we can create a tray icon, set a tooltip for it, display a balloon notification.
 &hellip;at the same time.
-How can we display multiple notifications one after another, indicating a job's status?
+How can we display multiple notifications one after another, indicating a job&rsquo;s status?
 <code>NIM_MODIFY</code> is used for that purpose.</p>
-<p>Think of a tray icon's lifecycle as this diagram:</p>
+<p>Think of a tray icon&rsquo;s lifecycle as this diagram:</p>
 <figure>
     <img src="3-state-diagram.png"
-         alt="A tray icon&#39;s lifecycle"/> <figcaption>
-            <p>A tray icon's lifecycle</p>
+         alt="A tray icon&amp;rsquo;s lifecycle"/> <figcaption>
+            <p>A tray icon&rsquo;s lifecycle</p>
         </figcaption>
 </figure>
 
@@ -199,9 +199,9 @@ Then during our tray icon is alive in taskbar, we use <code>NIM_MODIFY</code> to
 If our jobs is finished, delete the tray icon with <code>NIM_DELETE</code>.</p>
 <p>The word <em>modify</em> in <code>NIM_MODIFY</code> seems weird at first, but think about it as <code>NIM_UPDATE</code>.</p>
 <h2 id="refactoring-code">Refactoring Code</h2>
-<p>Before testing if our application can fire multiple balloon notifications, let's refactor the code.
+<p>Before testing if our application can fire multiple balloon notifications, let&rsquo;s refactor the code.
 Our main code has become too large!</p>
-<p>We're gonna make <code>TrayIcon</code> struct to represent our tray icon.
+<p>We&rsquo;re gonna make <code>TrayIcon</code> struct to represent our tray icon.
 It will have these exported methods:</p>
 <ul>
 <li><code>SetIcon(icon uintptr) error</code></li>
@@ -229,15 +229,15 @@ Seeing its C equivalent will help you understand it:</p>
     rand.<span style="color:#447fcf">Seed</span>(time.<span style="color:#447fcf">Now</span>().<span style="color:#447fcf">UnixNano</span>())
 }
 </code></pre></div><p>This code will be run every time we start our application.</p>
-<p>So we can now start writing code, let's define our struct first:</p>
+<p>So we can now start writing code, let&rsquo;s define our struct first:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">type</span> TrayIcon <span style="color:#6ab825;font-weight:bold">struct</span> {
     hwnd <span style="color:#6ab825;font-weight:bold">uintptr</span>
     guid GUID
 }
 </code></pre></div><p><code>hwnd</code> member is still necessary even if we use <code>guidItem</code> instead of <code>hWnd + uID</code> because one tray icon should be associated with a window in order to persist in the taskbar and interact with users.</p>
-<p>We used same <code>NOTIFYICONDATA</code> over multiple <code>Shell_NotifyIcon</code> calls before, but for our <code>TrayIcon</code> struct, we can't do that anymore.
+<p>We used same <code>NOTIFYICONDATA</code> over multiple <code>Shell_NotifyIcon</code> calls before, but for our <code>TrayIcon</code> struct, we can&rsquo;t do that anymore.
 Instead, we should prepare <code>NOTIFYICONDATA</code> per every call.
-But most part of it(<code>CbSize</code>, <code>HWnd</code>, <code>GUIDItem</code>) will be the same over multiple calls for each tray icon, so we're gonna make a helper method to create a base <code>NOTIFYICONDATA</code> instance.
+But most part of it(<code>CbSize</code>, <code>HWnd</code>, <code>GUIDItem</code>) will be the same over multiple calls for each tray icon, so we&rsquo;re gonna make a helper method to create a base <code>NOTIFYICONDATA</code> instance.
 This will reduce redundancy of our code:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> (ti *TrayIcon) <span style="color:#447fcf">initData</span>() *NOTIFYICONDATA {
     <span style="color:#6ab825;font-weight:bold">var</span> data NOTIFYICONDATA
@@ -247,7 +247,7 @@ This will reduce redundancy of our code:</p>
     data.GUIDItem = ti.guid
     <span style="color:#6ab825;font-weight:bold">return</span> &amp;data
 }
-</code></pre></div><p>We set <code>UFlags</code> to <code>NIF_GUID</code>, and later we'll add more flags using bit OR operator(<code>|</code>).
+</code></pre></div><p>We set <code>UFlags</code> to <code>NIF_GUID</code>, and later we&rsquo;ll add more flags using bit OR operator(<code>|</code>).
 And it also gets rid of concern about zero-filling <code>Sz*</code> members before copying data into them.</p>
 <p>Next step is to create <code>New</code> method for our <code>TrayIcon</code> struct:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">NewTrayIcon</span>(hwnd <span style="color:#6ab825;font-weight:bold">uintptr</span>) (*TrayIcon, <span style="color:#6ab825;font-weight:bold">error</span>) {
@@ -257,8 +257,8 @@ And it also gets rid of concern about zero-filling <code>Sz*</code> members befo
     }
     <span style="color:#6ab825;font-weight:bold">return</span> ti, <span style="color:#6ab825;font-weight:bold">nil</span>
 }
-</code></pre></div><p>Simple enough, isn't it?
-Let's add other methods right away.</p>
+</code></pre></div><p>Simple enough, isn&rsquo;t it?
+Let&rsquo;s add other methods right away.</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> (ti *TrayIcon) <span style="color:#447fcf">Dispose</span>() <span style="color:#6ab825;font-weight:bold">error</span> {
     _, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_DELETE, ti.<span style="color:#447fcf">initData</span>())
     <span style="color:#6ab825;font-weight:bold">return</span> err
@@ -290,7 +290,7 @@ Let's add other methods right away.</p>
 	_, err := <span style="color:#447fcf">Shell_NotifyIcon</span>(NIM_MODIFY, data)
 	<span style="color:#6ab825;font-weight:bold">return</span> err
 }
-</code></pre></div><p>And that's it!
+</code></pre></div><p>And that&rsquo;s it!
 Now we can use our <code>TrayIcon</code> in main function:</p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">main</span>() {
 	hwnd, err := <span style="color:#447fcf">createMainWindow</span>()
@@ -343,11 +343,11 @@ Now we can use our <code>TrayIcon</code> in main function:</p>
         )
     }
 }()
-</code></pre></div><p>This is just for testing purpose, you can use it to display a job's progress, etc.</p>
+</code></pre></div><p>This is just for testing purpose, you can use it to display a job&rsquo;s progress, etc.</p>
 <h2 id="user-interactions">User Interactions</h2>
-<p>Finally, it's time to respond to user interactions.
-If a user clicks our tray icon or click the balloon notifcation we'd like to do something meaningful like bringing up our application window to the front.
-You can also show a context menu but I'll not cover that in this tutorial, still you can find many third party packages on GitHub.</p>
+<p>Finally, it&rsquo;s time to respond to user interactions.
+If a user clicks our tray icon or click the balloon notifcation we&rsquo;d like to do something meaningful like bringing up our application window to the front.
+You can also show a context menu but I&rsquo;ll not cover that in this tutorial, still you can find many third party packages on GitHub.</p>
 <p>When user clicks the tray icon or the balloon notification, we can catch that message in our <code>wndProc</code>.
 To enable this feature, we set <code>NIF_MESSAGE</code> for <code>uFlags</code> and a random message id for <code>uCallbackMessage</code> in our <code>NOTIFYICONDATA</code>.
 It is recommended to use value above <code>WM_APP</code>(0x8000) for <code>uCallbackMessage</code>.</p>
