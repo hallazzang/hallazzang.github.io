@@ -81,7 +81,7 @@ if (!doNotTrack) {
 </div>
 <hr>
 <p>This post will explain how to track HTTP redirection history in Golang.</p>
-<p>(Prelude WIP)</p>
+<p>(WIP)</p>
 <h2 id="solution">Solution</h2>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">func</span> <span style="color:#447fcf">Redirections</span>(resp *http.Response) (history []*http.Request) {
 	<span style="color:#6ab825;font-weight:bold">for</span> resp != <span style="color:#6ab825;font-weight:bold">nil</span> {
@@ -92,7 +92,8 @@ if (!doNotTrack) {
 	<span style="color:#6ab825;font-weight:bold">return</span>
 }
 </code></pre></div><p>This returns all requests made for a particular response in a slice.</p>
-<p>Note that the last request(that eventually made the response) comes first in the slice, so to reverse the order, use this technique(take from <a href="https://github.com/golang/go/wiki/SliceTricks#reversing):">https://github.com/golang/go/wiki/SliceTricks#reversing):</a></p>
+<p>Note that the last request(that eventually made the response) comes first in the slice,
+so to reverse the order, use this technique(taken from <a href="https://github.com/golang/go/wiki/SliceTricks#reversing):">https://github.com/golang/go/wiki/SliceTricks#reversing):</a></p>
 <div class="highlight"><pre style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#6ab825;font-weight:bold">for</span> l, r := <span style="color:#3677a9">0</span>, <span style="color:#24909d">len</span>(history)-<span style="color:#3677a9">1</span>; l &lt; r; l, r = l+<span style="color:#3677a9">1</span>, r-<span style="color:#3677a9">1</span> {
     history[l], history[r] = history[r], history[l]
 }
